@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
 import sys
@@ -67,7 +67,29 @@ class BridgeServer:
             sys.exit(0)
         raise ValueError(f"Tipo de mensaje no permitido: {msg_type}")
 
+    def _has_background_task(self) -> bool:
+        thread = getattr(self.host, "active_thread", None)
+        return bool(thread and thread.is_alive())
+
     def _start_action(self, request_id: str, action: str, payload: dict):
+        non_blocking = {
+            "app.info",
+            "dashboard.open_logs",
+            "tools.open_logs",
+            "updates.load_settings",
+            "ping.favorites",
+            "ping.add_favorite",
+            "ping.delete_favorite",
+            "dashboard.ping",
+        }
+        with self._actions_lock:
+            busy = bool(self._running_actions) or self._has_background_task()
+        if busy and action not in non_blocking:
+            message = "Ya hay una tarea en ejecución. Cancela la tarea actual o espera a que termine antes de iniciar otra."
+            self.sink.emit("error", id=request_id, action=action, source="BACKEND", level="warning", title="Proceso en curso", message=message)
+            self.sink.emit("finished", id=request_id, action=action, success=False, result={"busy": True, "message": message})
+            return
+
         def worker():
             success = True
             result = {}

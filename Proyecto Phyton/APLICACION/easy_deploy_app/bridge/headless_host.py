@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import os
 import queue
@@ -356,6 +356,11 @@ class HeadlessEasyDeployHost(
 
     def cancelar_proceso(self):
         self.stop_event.set()
+        try:
+            if self.console_input_queue is not None:
+                self.console_input_queue.put_nowait(None)
+        except Exception:
+            pass
         try:
             process = getattr(self, "active_process", None)
             if process and process.poll() is None:

@@ -700,6 +700,13 @@ class ActionRegistry:
             'del "%~f0" >nul 2>nul\r\n',
             encoding="utf-8",
         )
-        subprocess.Popen(["cmd.exe", "/c", str(helper)], creationflags=subprocess.CREATE_NO_WINDOW)
+        try:
+            os.startfile(str(helper))
+        except Exception:
+            subprocess.Popen(
+                ["cmd.exe", "/c", "start", "", str(helper)],
+                creationflags=getattr(subprocess, "DETACHED_PROCESS", 0) | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0) | subprocess.CREATE_NO_WINDOW,
+                close_fds=True,
+            )
         self.host.sink.emit("restart_required", installer=str(installer))
         return {"launched": True, "installer": str(installer)}

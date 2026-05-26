@@ -5,6 +5,29 @@ Cada fecha debe mostrarse con la versión más alta de ese día.
 
 CHANGELOG = [
     (
+        '2.2.5.27',
+        '26/05/2026',
+        [
+            'Cierre completo del backend Python al cerrar Easy Deploy y al desinstalar desde Windows.',
+            'Cancelación protegida para tareas de roles, características e instalaciones críticas no cancelables.',
+            'Movido el botón Cancelar junto al botón RUN en la consola con estilo rojizo.',
+            'Reforzado el foco de prompts React para escribir directamente en KMS, IPs, dominios y números.',
+            'Actualizador reforzado para lanzar el instalador desde un helper desacoplado antes del cierre de la app.',
+        ],
+    ),
+    (
+        '2.2.5.26',
+        '26/05/2026',
+        [
+            'Añadido bloqueo global de ejecución para impedir iniciar otra tarea mientras una acción sigue activa.',
+            'Añadido botón Cancelar en la consola para solicitar la detención de tareas, procesos y prompts activos.',
+            'Corregido el flujo del actualizador para esperar al lanzamiento real del instalador antes de cerrar Easy Deploy.',
+            'Mejorado el helper de actualización para ejecutar el instalador de forma desacoplada y borrar el archivo descargado al terminar.',
+            'Aplicado cursor de mano a botones Ejecutar de KMS, SharePoint, SQL Server 2022 y JCHAT.',
+            'Reforzado el foco de campos de texto en prompts React para evitar tener que salir y volver a entrar en la app.',
+        ],
+    ),
+    (
         '2.2.5.25',
         '26/05/2026',
         [
