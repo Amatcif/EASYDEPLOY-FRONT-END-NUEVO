@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+:root {
+  /* Default: Slate/Indigo style */
+  --theme-bg-app: #0a0c10;
+  --theme-bg-sidebar: #0e1117;
+  --theme-bg-header: #0a0c10;
+  --theme-bg-main: #06080b;
+  --theme-bg-card: #10141d;
+  --theme-bg-well: #0c0f16;
+  --theme-border-card: #1b2330;
+  --theme-border-well: #141c27;
+  --theme-text-primary: #f1f5f9;
+  --theme-text-secondary: #94a3b8;
+  --theme-accent-primary: #6366f1;
+  --theme-accent-hover: #4f46e5;
+  --theme-indigo-950: #1e1b4b;
+}
+
+/* Theme definitions */
+.theme-slate {
+  --theme-bg-app: #0a0c10;
+  --theme-bg-sidebar: #0e1117;
+  --theme-bg-header: #0a0c10;
+  --theme-bg-main: #06080b;
+  --theme-bg-card: #10141d;
+  --theme-bg-well: #0c0f16;
+  --theme-border-card: #1b2330;
+  --theme-border-well: #141c27;
+  --theme-text-primary: #f1f5f9;
+  --theme-text-secondary: #94a3b8;
+  --theme-accent-primary: #6366f1;
+  --theme-accent-hover: #4f46e5;
+  --theme-indigo-950: #1e1b4b;
+}
+
+.theme-camel {
+  --theme-bg-app: #f4f4f2;         /* Softer, extremely eye-friendly off-white / ivory gray background with absolutely zero pink */
+  --theme-bg-sidebar: #dfdfde;     /* Elegant matching ivory-gray sidebar for restful contrast */
+  --theme-bg-header: #f4f4f2;      /* Top bar background matching Blanco theme background */
+  --theme-bg-main: #fafaf9;        /* Comforting and soothing light ivory gray main workspace */
+  --theme-bg-card: #ffffff;        /* Clean elegant white cards */
+  --theme-bg-well: #eae9e6;        /* Restful deeper natural gray wells/log panels */
+  --theme-border-card: #dbdbda;    /* Soft, neutral gray outlining */
+  --theme-border-well: #cfcfce;
+  --theme-border-header: #dbdbda;
+  --theme-text-primary: #1f1f1e;   /* Deep elegant charcoal black for stellar legibility */
+  --theme-text-secondary: #5e5e5c; /* Elegant muted slate gray description text */
+  --theme-accent-primary: #334155; /* Sophisticated professional slate-gray primary accent */
+  --theme-accent-hover: #1e293b;   /* Deep charcoal hover state */
+  --theme-indigo-950: #e2e8f0;     /* Lightest premium gray highlight */
+}
+
+.theme-emerald {
+  --theme-bg-app: #131814;         /* Rich military olive black */
+  --theme-bg-sidebar: #1a201b;     /* Shaded dark olive container */
+  --theme-bg-header: #131814;
+  --theme-bg-main: #0e120f;        /* Deep army military background */
+  --theme-bg-card: #1d241e;        /* Dark olive stone cards */
+  --theme-bg-well: #141915;        /* Army military logic block representation */
+  --theme-border-card: #2a322b;    /* Muted olive border outline */
+  --theme-border-well: #1e2520;
+  --theme-border-header: #2a322b;
+  --theme-text-primary: #edf2ee;   /* Soft sage text */
+  --theme-text-secondary: #8fa092; /* Pastel army description text */
+  --theme-accent-primary: #8da35b; /* Stunning desaturated military olive green from image */
+  --theme-accent-hover: #738c43;   /* Deeper army olive color for hover action feedback */
+  --theme-indigo-950: #232d25;     /* Dark desaturated army cover background */
+}
+
+.theme-cyber {
+  --theme-bg-app: #030303;         /* Pure cyber pitch black space */
+  --theme-bg-sidebar: #09090b;     /* Slate block core */
+  --theme-bg-header: #030303;
+  --theme-bg-main: #000000;        /* Absolut black vacuum workspace */
+  --theme-bg-card: #121217;        /* Polycarbonate chassis plate */
+  --theme-bg-well: #08080a;        /* Carbon fiber logs window backplate */
+  --theme-border-card: #2d2d34;    /* Laser etched framework lines */
+  --theme-border-well: #181820;
+  --theme-border-header: #2d2d34;
+  --theme-text-primary: #fafafa;   /* Titanium white */
+  --theme-text-secondary: #a1a1aa; /* Steel gray */
+  --theme-accent-primary: #06b6d4; /* Vibrant digital neon cyan */
+  --theme-accent-hover: #0891b2;   /* Heavy cobalt laser shade */
+  --theme-indigo-950: #082f49;     /* Deep cyber ocean ambient indicator */
+}
+
+@theme {
+  --color-slate-950: var(--theme-bg-app);
+  --color-slate-900: var(--theme-bg-card);
+  --color-slate-800: var(--theme-border-card);
+  --color-slate-850: var(--theme-border-well);
+  --color-slate-100: var(--theme-text-primary);
+  --color-slate-200: var(--theme-text-primary);
+  --color-slate-250: var(--theme-text-primary);
+  --color-slate-300: var(--theme-text-primary);
+  --color-slate-350: var(--theme-text-secondary);
+  --color-slate-400: var(--theme-text-secondary);
+  --color-slate-500: var(--theme-text-secondary);
+  --color-slate-550: var(--theme-text-secondary);
+  --color-indigo-600: var(--theme-accent-primary);
+  --color-indigo-505: var(--theme-accent-hover);
+  --color-indigo-500: var(--theme-accent-primary);
+  --color-indigo-400: var(--theme-accent-primary);
+  --color-indigo-950: var(--theme-indigo-950);
+}
+
+@layer utilities {
+  /* Premium glassmorphic effect */
+  .glass-card {
+    background: var(--theme-bg-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--theme-border-card);
+  }
+
+  .glass-card-hover {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .glass-card-hover:hover {
+    background: var(--theme-bg-card);
+    border-color: var(--theme-accent-primary);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4), 0 0 1px 1px var(--theme-bg-active);
+    transform: translateY(-2px);
+  }
+
+  /* Custom subtle scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: var(--theme-bg-app);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--theme-border-card);
+    border-radius: 3px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--theme-accent-primary);
+  }
+}

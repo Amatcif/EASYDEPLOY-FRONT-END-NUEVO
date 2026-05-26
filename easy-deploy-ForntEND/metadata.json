@@ -1,0 +1,6 @@
+{
+  "name": "Easy Deploy Admin Center",
+  "description": "Un panel de control unificado para despliegues masivos fuera de línea, aprovisionamiento de Active Directory, Exchange, Skype for Business, diagnóstico de redes y políticas de seguridad.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

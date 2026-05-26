@@ -1,0 +1,44 @@
+appId: com.easydeploy.desktop
+productName: EasyDeploy
+asar: true
+buildVersion: 2.2.5.23
+
+directories:
+  output: dist_desktop
+
+files:
+  - dist/**/*
+  - main.cjs
+  - preload.js
+  - package.json
+
+extraResources:
+  - from: backend_dist/easydeploy_backend.exe
+    to: backend/easydeploy_backend.exe
+    filter:
+      - easydeploy_backend.exe
+
+win:
+  icon: ../Proyecto Phyton/APLICACION/iconos/logotipo.ico
+  executableName: EASY DEPLOY
+  target:
+    - target: nsis
+      arch:
+        - x64
+  requestedExecutionLevel: requireAdministrator
+  artifactName: EasyDeploy_Setup_v2.2.5.23_${arch}.${ext}
+
+nsis:
+  include: build/installer.nsh
+  oneClick: false
+  perMachine: true
+  allowElevation: true
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Easy Deploy
+  uninstallDisplayName: Easy Deploy
+  deleteAppDataOnUninstall: false
+
+extraMetadata:
+  main: main.cjs
