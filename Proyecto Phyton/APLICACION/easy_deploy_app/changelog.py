@@ -1,9 +1,21 @@
-﻿"""Historial visible de cambios de Easy Deploy.
+"""Historial visible de cambios de Easy Deploy.
 Orden obligatorio: de más reciente a más antiguo.
 Cada fecha debe mostrarse con la versión más alta de ese día.
 """
 
 CHANGELOG = [
+    (
+        '2.2.5.24',
+        '26/05/2026',
+        [
+            'Reorganizado menú Sistemas con KMS, SharePoint, SQL y JCHAT como secciones propias.',
+            'Movido Net Framework 3.5 a Instaladores Offline e incluido en Instalar todo el arsenal.',
+            'Movido Forzar políticas GPO a Herramientas > Sistema.',
+            'Eliminado bloque técnico visible de versión/bridge/teclado/preload y Sincronización y Directorio.',
+            'Añadidos prompts React para Ping, usuarios AD/Exchange, dominio y acciones antiguas que pedían datos.',
+            'Recursos, Logs y Actualizaciones muestran resultado sin redirigir innecesariamente a consola.',
+        ],
+    ),
     (
         '2.2.5.23',
         '26/05/2026',

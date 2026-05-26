@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import hashlib
 import json
@@ -130,17 +130,23 @@ class ActionRegistry:
             "dashboard.disk_management": lambda payload: self.host._accion_abrir_disk_management(),
             "system.time_sync": lambda payload: self.host.iniciar_tarea(self.host.task_time_sync),
             "system.kms": lambda payload: self.host.iniciar_tarea(self.host.task_kms),
+            "kms.run": lambda payload: self.host.iniciar_tarea(self.host.task_kms),
             "system.sql": lambda payload: self.host.iniciar_tarea(self.host.task_install_sql),
+            "sql.install_2022": lambda payload: self.host.iniciar_tarea(self.host.task_install_sql),
             "system.jchat": lambda payload: self.host.iniciar_tarea(self.host.task_jchat),
+            "jchat.openfire": lambda payload: self.host.iniciar_tarea(self.host.task_jchat),
             "system.jchat_cli": lambda payload: self.host.iniciar_tarea(self.host.task_jchat_cli),
+            "jchat.cli": lambda payload: self.host.iniciar_tarea(self.host.task_jchat_cli),
             "sharepoint.roles": lambda payload: self.host.iniciar_tarea(self.host.task_sp_roles),
             "sharepoint.install": lambda payload: self.host.iniciar_tarea(self.host.task_sp_prereqs),
             "ad.dc1": lambda payload: self.host.pre_task_dc1(),
             "ad.dc2": lambda payload: self.host.pre_task_dc2(),
             "ad.join_domain": lambda payload: self.host.pre_task_join_domain(),
             "ad.gpo": lambda payload: self.host.iniciar_tarea(self.host.task_gpupdate_force),
+            "tools.gpo_force": lambda payload: self.host.iniciar_tarea(self.host.task_gpupdate_force),
             "ad.create_users": self.ad_create_users,
             "ad.netfx35": lambda payload: self.host.iniciar_tarea(self.host.task_netfx35),
+            "programs.netfx35": lambda payload: self.host.iniciar_tarea(self.host.task_netfx35),
             "ad.repadmin": lambda payload: self.host.iniciar_tarea(task_repadmin_syncall, self.host),
             "ad.d2d4": self.d2d4_action,
             "exchange.prereqs": lambda payload: self.host.pre_task_exchange_prereqs(),
@@ -156,6 +162,7 @@ class ActionRegistry:
             "programs.winrar": lambda payload: self.host.iniciar_tarea(self.host.task_install_winrar),
             "programs.adobe_reader": lambda payload: self.host.iniciar_tarea(self.host.task_install_adobe_reader),
             "programs.office_skype": lambda payload: self.host.pre_task_install_office_skype(),
+            "programs.install_all": self.programs_install_all,
             "security.firewall_status": self.firewall_status,
             "security.firewall_disable": lambda payload: self.host.pre_task_disable_windows_firewall(),
             "security.firewall_enable": lambda payload: self.host.iniciar_tarea(self.host.task_enable_windows_firewall),
@@ -208,15 +215,21 @@ class ActionRegistry:
             "ad.dc2",
             "ad.join_domain",
             "ad.gpo",
+            "tools.gpo_force",
             "ad.netfx35",
+            "programs.netfx35",
             "ad.repadmin",
             "ad.d2d4",
             "ad.create_users",
             "system.time_sync",
             "system.kms",
+            "kms.run",
             "system.sql",
+            "sql.install_2022",
             "system.jchat",
+            "jchat.openfire",
             "system.jchat_cli",
+            "jchat.cli",
             "sharepoint.roles",
             "sharepoint.install",
             "exchange.prereqs",
@@ -232,6 +245,7 @@ class ActionRegistry:
             "programs.winrar",
             "programs.adobe_reader",
             "programs.office_skype",
+            "programs.install_all",
             "security.firewall_disable",
             "security.firewall_enable",
             "networks.switch_allied",
@@ -472,6 +486,22 @@ class ActionRegistry:
         favorites = self.host._load_ping_favorites()
         self.host.sink.emit("data", name="ping.favorites", value=favorites)
         return {"ok": bool(deleted), "favorites": favorites}
+
+    def programs_install_all(self, payload):
+        """Ejecuta el arsenal offline en el mismo orden visual del front-end."""
+        self.host.sink.emit("log", source="INSTALLER", level="info", message="Iniciando Instalar todo el arsenal: .NET 3.5, Firefox, WinRAR, Adobe Reader y Office + Skype.")
+        tasks = (
+            ("Net Framework 3.5", self.host.task_netfx35),
+            ("Firefox", self.host.task_install_firefox),
+            ("WinRAR", self.host.task_install_winrar),
+            ("Adobe Reader", self.host.task_install_adobe_reader),
+        )
+        for label, task in tasks:
+            self.host.sink.emit("log", source="INSTALLER", level="info", message=f"Instalando {label}...")
+            self.host.iniciar_tarea(task)
+        self.host.sink.emit("log", source="INSTALLER", level="info", message="Lanzando Office + Skype...")
+        self.host.pre_task_install_office_skype()
+        return {"ok": True, "components": 5}
 
     def d2d4_action(self, payload):
         action_key = str((payload or {}).get("mode") or "").strip().lower()
