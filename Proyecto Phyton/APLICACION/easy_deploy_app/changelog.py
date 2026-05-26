@@ -5,6 +5,19 @@ Cada fecha debe mostrarse con la versión más alta de ese día.
 
 CHANGELOG = [
     (
+        '2.2.5.25',
+        '26/05/2026',
+        [
+            'Pulida pestaña Actualizaciones: ocultadas URL/SHA/instalador y añadida barra de descarga.',
+            'Añadido flujo de descarga, aviso de cierre, lanzamiento de instalador y limpieza posterior mediante helper.',
+            'Corregidos avisos de Privilegios, confirmación al cambiar endpoint update.json y apertura de Logs.',
+            'Mejorado el foco de prompts React para KMS, AD, Exchange, dominio y entradas antiguas.',
+            'La consola limpia la salida al iniciar una tarea nueva y añade acceso directo a Logs.',
+            'Mejorado Monitor de ping con estados verde/rojo/gris y botón X para cerrar cada ping.',
+            'Reforzada apertura de herramientas interactivas de red Allied, Cisco y Router.',
+        ],
+    ),
+    (
         '2.2.5.24',
         '26/05/2026',
         [

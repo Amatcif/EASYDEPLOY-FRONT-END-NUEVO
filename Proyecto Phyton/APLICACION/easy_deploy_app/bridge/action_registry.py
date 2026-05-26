@@ -7,6 +7,7 @@ import re
 import subprocess
 import urllib.parse
 import urllib.request
+from datetime import datetime
 from pathlib import Path
 
 from ..constants import APP_NAME, APP_VERSION
@@ -253,8 +254,37 @@ class ActionRegistry:
             "networks.router",
         }
 
+    def _mask_payload_for_log(self, payload):
+        if not isinstance(payload, dict):
+            return payload
+        masked = {}
+        for key, value in payload.items():
+            if any(token in str(key).lower() for token in ("password", "clave", "code", "token", "secret")):
+                masked[key] = "***"
+            else:
+                masked[key] = value
+        return masked
+
+    def _write_action_audit(self, action_id: str, payload=None, status="inicio", result=None):
+        try:
+            logs_dir = Path(self.host.log_manager.logs_dir)
+            logs_dir.mkdir(parents=True, exist_ok=True)
+            safe_action = re.sub(r"[^A-Za-z0-9_.-]+", "_", str(action_id or "accion")).strip("_")[:80] or "accion"
+            stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+            audit_path = logs_dir / f"{stamp}_{safe_action}_audit.log"
+            with audit_path.open("a", encoding="utf-8") as handle:
+                handle.write(f"Acción: {action_id}\n")
+                handle.write(f"Estado: {status}\n")
+                handle.write(f"Fecha local: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                handle.write(f"Payload: {json.dumps(self._mask_payload_for_log(payload or {}), ensure_ascii=False)}\n")
+                if result is not None:
+                    handle.write(f"Resultado: {json.dumps(result, ensure_ascii=False, default=str)}\n")
+        except Exception:
+            pass
+
     def run(self, action_id: str, payload=None):
         payload = payload or {}
+        self._write_action_audit(action_id, payload, "inicio")
         handler = self.actions.get(action_id)
         if not handler:
             raise KeyError(f"Acción no permitida: {action_id}")
@@ -271,7 +301,9 @@ class ActionRegistry:
             }
         self.host.sink.emit("status", level="info", message=f"[PYTHON] Ejecutando acción: {action_id}")
         result = handler(payload)
-        return result if isinstance(result, dict) else {"ok": True}
+        final_result = result if isinstance(result, dict) else {"ok": True}
+        self._write_action_audit(action_id, payload, "finalizada", final_result)
+        return final_result
 
     def app_info(self, payload):
         return {
@@ -376,7 +408,7 @@ class ActionRegistry:
     def open_logs(self, payload=None):
         path = self.host.log_manager.logs_dir
         os.makedirs(path, exist_ok=True)
-        os.startfile(path)
+        subprocess.Popen(["explorer.exe", str(path)], creationflags=subprocess.CREATE_NO_WINDOW)
         return {"path": path}
 
     def open_resources(self, payload=None):
