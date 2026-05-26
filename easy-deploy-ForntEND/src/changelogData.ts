@@ -1,10 +1,22 @@
-﻿export interface ChangelogItem {
+export interface ChangelogItem {
   version: string;
   date: string;
   changes: string[];
 }
 
 export const changelogData: ChangelogItem[] = [
+  {
+    version: '2.2.5.24',
+    date: '26/05/2026',
+    changes: [
+      'Reorganizado Sistemas con KMS, SharePoint, SQL y JCHAT como secciones propias.',
+      'Movido Net Framework 3.5 a Instaladores Offline e incluido en Instalar todo el arsenal.',
+      'Movido Forzar políticas GPO a Herramientas > Sistema.',
+      'Eliminados paneles técnicos visibles de bridge/preload/teclado y bloques decorativos de Active Directory.',
+      'Añadidos prompts React para datos de Ping, usuarios AD/Exchange, dominio y acciones antiguas que pedían entradas.',
+      'Recursos, Logs y Actualizaciones muestran resultado sin redirigir innecesariamente a consola.'
+    ]
+  },
   {
     version: '2.2.5.23',
     date: '26/05/2026',

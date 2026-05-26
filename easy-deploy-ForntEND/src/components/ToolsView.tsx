@@ -14,6 +14,7 @@ const toolSections = [
       { label: 'AD Users and Computers', detail: 'Abrir consola dsa.msc', action: 'tools.aduc', icon: Users },
       { label: 'DNS Manager', detail: 'Abrir consola dnsmgmt.msc', action: 'tools.dns_manager', icon: Database },
       { label: 'Group Policy Management', detail: 'Abrir gpmc.msc', action: 'tools.gpmc', icon: Archive },
+      { label: 'Forzar políticas GPO', detail: 'Ejecutar gpupdate /force como en Easy Deploy clásico', action: 'tools.gpo_force', icon: Wrench },
     ],
   },
   {

@@ -14,12 +14,13 @@ import {
   Shield, 
   Settings,
   Cpu,
-  User,
+  Database,
   Activity,
   Network,
   History,
   Award,
-  Key
+  Key,
+  ServerCog
 } from 'lucide-react';
 import { ActiveTab } from '../types';
 
@@ -37,7 +38,7 @@ type SidebarItem = {
   badge?: string;
 };
 
-export default function Sidebar({ activeTab, setActiveTab, systemName = "Easy Deploy", appVersion = "2.2.5.23" }: SidebarProps) {
+export default function Sidebar({ activeTab, setActiveTab, systemName = "Easy Deploy", appVersion = "2.2.5.24" }: SidebarProps) {
   const menuGroups: Array<{ title: string; items: SidebarItem[] }> = [
     {
       title: "Control General",
@@ -49,8 +50,12 @@ export default function Sidebar({ activeTab, setActiveTab, systemName = "Easy De
       title: "Sistemas",
       items: [
         { id: 'ad', name: 'Active Directory', icon: Shield },
+        { id: 'kms', name: 'KMS', icon: Key },
         { id: 'exchange', name: 'Exchange Server', icon: Mail },
+        { id: 'sharepoint', name: 'SharePoint', icon: ServerCog },
+        { id: 'sql', name: 'SQL', icon: Database },
         { id: 'skype', name: 'Skype for Business', icon: MessagesSquare },
+        { id: 'jchat', name: 'JCHAT', icon: Cpu },
         { id: 'offline_installers', name: 'Instaladores Offline', icon: DownloadCloud },
         { id: 'security', name: 'Seguridad y Auditoría', icon: Lock },
       ]
@@ -107,25 +112,6 @@ export default function Sidebar({ activeTab, setActiveTab, systemName = "Easy De
           </div>
         </div>
 
-        {/* Administrator Token */}
-        <div 
-          className="mt-2 border rounded-xl p-2.5 flex items-center gap-2.5"
-          style={{
-            backgroundColor: 'var(--theme-bg-app)',
-            borderColor: 'var(--theme-border-card)'
-          }}
-        >
-          <div className="w-5 h-5 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-            <User size={12} className="stroke-[2.5]" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex justify-between items-center">
-              <span className="text-[10px] font-bold truncate tracking-wide" style={{ color: 'var(--theme-text-primary)' }}>Ejecución local</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            </div>
-            <p className="text-[9px] font-mono font-medium truncate" style={{ color: 'var(--theme-text-secondary)' }}>Backend Python seguro</p>
-          </div>
-        </div>
       </div>
 
       {/* Navigation Groups */}
@@ -176,42 +162,6 @@ export default function Sidebar({ activeTab, setActiveTab, systemName = "Easy De
         ))}
       </nav>
 
-      {/* System Status Footer */}
-      <div 
-        className="p-3 border-t shrink-0 text-[10px] font-semibold font-mono space-y-1"
-        style={{
-          backgroundColor: 'var(--theme-bg-card)',
-          borderColor: 'var(--theme-border-card)',
-          color: 'var(--theme-text-secondary)'
-        }}
-      >
-        <div className="flex justify-between">
-          <span>VERSIÓN:</span>
-          <span style={{ color: 'var(--theme-text-primary)' }}>v{appVersion}</span>
-        </div>
-        <div className="flex justify-between">
-          <span>BRIDGE:</span>
-          <span className="truncate max-w-[100px]" style={{ color: 'var(--theme-text-primary)' }}>Python OK</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span>TECLADO:</span>
-          <span className="px-1 py-0.2 rounded border text-[9px]" style={{ backgroundColor: 'var(--theme-bg-app)', borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)' }}>ESP</span>
-        </div>
-        <div className="mt-2 pt-1 border-t flex justify-between items-center text-[9px]" style={{ borderColor: 'var(--theme-border-well)', color: 'var(--theme-accent-primary)' }}>
-          <span>Preload</span>
-          <div 
-            className="flex gap-1 items-center px-1.5 py-0.5 rounded border text-[9px]"
-            style={{
-              backgroundColor: 'var(--theme-bg-well)',
-              borderColor: 'var(--theme-border-well)',
-              color: 'var(--theme-accent-primary)'
-            }}
-          >
-            <Activity size={10} />
-            <span>OK</span>
-          </div>
-        </div>
-      </div>
     </aside>
   );
 }

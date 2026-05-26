@@ -1,8 +1,12 @@
 export type ActiveTab =
   | 'dashboard'
   | 'ad'
+  | 'kms'
   | 'exchange'
+  | 'sharepoint'
+  | 'sql'
   | 'skype'
+  | 'jchat'
   | 'offline_installers'
   | 'updates'
   | 'security'

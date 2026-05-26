@@ -1,8 +1,8 @@
 {
   "name": "easy-deploy",
   "private": true,
-  "version": "2.2.5-23",
-  "easyDeployVersion": "2.2.5.23",
+  "version": "2.2.5-24",
+  "easyDeployVersion": "2.2.5.24",
   "main": "main.cjs",
   "description": "Easy Deploy desktop frontend with Python bridge",
   "author": "Easy Deploy",

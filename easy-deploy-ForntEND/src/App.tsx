@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ActiveTab, SystemLog, WindowsRegistry } from './types';
 import Sidebar from './components/Sidebar';
 import DashboardView from './components/DashboardView';
@@ -17,6 +17,7 @@ import NetworksView from './components/NetworksView';
 import PingView from './components/PingView';
 import ConsolePanel from './components/ConsolePanel';
 import VersionsView from './components/VersionsView';
+import ServiceActionView from './components/ServiceActionView';
 import CreditsView from './components/CreditsView';
 import { backendClient, getDetectedBridgeApis } from './services/backendClient';
 import type { BackendEvent } from './types/backend';
@@ -44,9 +45,12 @@ export default function App() {
   const [appInfo, setAppInfo] = useState<Record<string, unknown>>({});
   const [backendProgress, setBackendProgress] = useState(0);
   const [backendData, setBackendData] = useState<Record<string, unknown>>({});
+  const [pendingPrompt, setPendingPrompt] = useState<BackendEvent | null>(null);
+  const [promptValue, setPromptValue] = useState('');
+  const [notification, setNotification] = useState<{ title: string; message: string; level: 'info' | 'success' | 'warning' | 'error' } | null>(null);
 
   const remainingDays = 7 - Math.min(registry.Dias_Transcurridos, 7);
-  const displayedVersion = String(appInfo.version || '2.2.5.23');
+  const displayedVersion = String(appInfo.version || '2.2.5.24');
 
   useEffect(() => {
     localStorage.setItem('premium-theme', theme);
@@ -54,7 +58,7 @@ export default function App() {
   
   // Custom console logs
   const [logs, setLogs] = useState<string[]>([
-    'Easy Deploy Orchestrator [v2.2.5.23]',
+    'Easy Deploy Orchestrator [v2.2.5.24]',
     'Copyright (C) 2026 Easy Deploy. Todos los derechos reservados.',
     '',
     '[BOOT] [i] Cargando front-end React/Electron...',
@@ -81,6 +85,36 @@ export default function App() {
     if (level === 'warning') prefix = '[AVISO]';
     if (level === 'error') prefix = '[ERROR]';
     return `[${source}] ${prefix} ${message}`;
+  };
+
+
+  const formatResourceReport = (report: Record<string, unknown>) => {
+    const root = String(report.root || 'Sin ruta');
+    const complete = report.complete === true;
+    const missing = Array.isArray(report.missing) ? report.missing.map(String) : [];
+    const present = Number(report.present_count || 0);
+    const total = Number(report.total || 0);
+    if (complete) {
+      return `Recursos correctos.
+
+Carpeta: ${root}
+Resultado: ${present}/${total} recursos encontrados.
+No faltan carpetas críticas.`;
+    }
+    return `Recursos incompletos.
+
+Carpeta: ${root}
+Resultado: ${present}/${total} recursos encontrados.
+
+Faltan recursos:
+${missing.length ? missing.map((item) => `- ${item}`).join('\n') : '- No se pudo determinar la lista exacta.'}`;
+  };
+
+  const finishPrompt = (value: unknown) => {
+    if (!pendingPrompt?.prompt_id) return;
+    backendClient.respondPrompt(String(pendingPrompt.prompt_id), value);
+    setPendingPrompt(null);
+    setPromptValue('');
   };
 
   useEffect(() => {
@@ -135,6 +169,13 @@ export default function App() {
       }
       if (event.type === 'log' || event.type === 'status' || event.type === 'error' || event.type === 'notification') {
         setLogs(prev => [...prev, formatBackendEvent(event)]);
+        if (event.type === 'notification') {
+          setNotification({
+            title: String(event.title || 'Easy Deploy'),
+            message: String(event.message || ''),
+            level: (event.level as any) || 'info',
+          });
+        }
         return;
       }
       if (event.type === 'progress') {
@@ -142,11 +183,9 @@ export default function App() {
         return;
       }
       if (event.type === 'prompt' && event.prompt_id) {
-        const heading = `${event.title || 'Easy Deploy'}\n\n${event.message || ''}`;
-        const value = event.kind === 'confirm'
-          ? window.confirm(heading)
-          : window.prompt(heading, String(event.default || ''));
-        backendClient.respondPrompt(String(event.prompt_id), value);
+        setActiveTab('deployment_console');
+        setPromptValue(String(event.default || ''));
+        setPendingPrompt(event);
         return;
       }
       if (event.type === 'data') {
@@ -164,6 +203,17 @@ export default function App() {
         return;
       }
       if (event.type === 'finished') {
+        if (event.action && event.result !== undefined) {
+          setBackendData(prev => ({ ...prev, [String(event.action)]: event.result }));
+        }
+        if (event.action === 'dashboard.check_resources' && event.result && typeof event.result === 'object') {
+          const report = event.result as Record<string, unknown>;
+          setNotification({
+            title: report.complete === true ? 'Recursos correctos' : 'Recursos incompletos',
+            message: formatResourceReport(report),
+            level: report.complete === true ? 'success' : 'warning',
+          });
+        }
         setLogs(prev => [...prev, `[${event.action || 'BACKEND'}] ${event.success ? '[OK]' : '[ERROR]'} Acción finalizada.`]);
       }
     });
@@ -175,18 +225,20 @@ export default function App() {
       'ad.dc1',
       'ad.dc2',
       'ad.join_domain',
-      'ad.gpo',
-      'ad.netfx35',
+      'ad.create_users',
       'ad.repadmin',
       'ad.d2d4',
-      'ad.create_users',
-      'system.time_sync',
+      'kms.run',
       'system.kms',
+      'sql.install_2022',
       'system.sql',
+      'jchat.openfire',
+      'jchat.cli',
       'system.jchat',
       'system.jchat_cli',
-      'sharepoint.roles',
       'sharepoint.install',
+      'sharepoint.roles',
+      'tools.gpo_force',
       'exchange.prereqs',
       'exchange.prepare_schema',
       'exchange.install',
@@ -196,10 +248,12 @@ export default function App() {
       'skype.install',
       'skype.permissions',
       'skype.dns',
+      'programs.netfx35',
       'programs.firefox',
       'programs.winrar',
       'programs.adobe_reader',
       'programs.office_skype',
+      'programs.install_all',
       'security.firewall_disable',
       'security.firewall_enable',
       'networks.switch_allied',
@@ -207,19 +261,42 @@ export default function App() {
       'networks.router',
     ]);
     if (confirmRequired.has(action) && payload.dryRun !== true) {
-      const proceed = window.confirm(`Easy Deploy va a ejecutar una acción real:\n\n${action}\n\nLa salida se mostrará en la consola. ¿Quieres continuar?`);
+      const proceed = window.confirm(`Easy Deploy va a ejecutar una acción real:
+
+${action}
+
+La salida se mostrará en la consola o se pedirán datos mediante una ventana. ¿Quieres continuar?`);
       if (!proceed) {
         setLogs(prev => [...prev, `[CLIENT] [AVISO] Acción cancelada por el usuario: ${action}`]);
         return { cancelled: true };
       }
     }
+
     const stayOnPage = payload.stayOnPage === true;
-    const visualOnly = action === 'app.info'
-      || action.startsWith('updates.')
-      || action.startsWith('activation.')
-      || action === 'tools.versions'
-      || action === 'tools.credits';
-    if (!stayOnPage && !visualOnly) {
+    const noConsoleActions = new Set([
+      'app.info',
+      'dashboard.check_admin',
+      'dashboard.check_resources',
+      'dashboard.open_logs',
+      'dashboard.keyboard_es',
+      'tools.open_logs',
+      'tools.open_resources',
+      'tools.versions',
+      'tools.credits',
+      'updates.load_settings',
+      'updates.save_endpoint',
+      'updates.check',
+      'updates.download',
+      'updates.launch_installer',
+      'activation.status',
+      'activation.activate',
+      'activation.trial_status',
+      'ping.favorites',
+      'ping.add_favorite',
+      'ping.delete_favorite',
+    ]);
+    const shouldOpenConsole = !stayOnPage && !noConsoleActions.has(action) && !action.startsWith('updates.') && !action.startsWith('activation.');
+    if (shouldOpenConsole) {
       setActiveTab('deployment_console');
     }
     return backendClient.runAction(action, payload);
@@ -323,20 +400,9 @@ export default function App() {
           }}
         >
           <div className="flex items-center gap-3">
-            <span 
-              className="text-[10px] font-bold font-mono tracking-widest px-2 py-0.5 rounded border"
-              style={{
-                backgroundColor: 'var(--theme-bg-well)',
-                borderColor: 'var(--theme-border-well)',
-                color: 'var(--theme-accent-primary)'
-              }}
-            >
-              EASY DEPLOY v{displayedVersion}
+            <span className="text-[10px] font-bold font-mono tracking-widest uppercase" style={{ color: 'var(--theme-text-secondary)' }}>
+              Panel de administración
             </span>
-            <div className="hidden sm:flex items-center gap-1.5 text-xs" style={{ color: 'var(--theme-text-secondary)' }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Bridge Python <strong style={{ color: 'var(--theme-text-primary)' }}>activo</strong></span>
-            </div>
           </div>
  
           <div className="flex items-center gap-5 text-xs font-mono" style={{ color: 'var(--theme-text-secondary)' }}>
@@ -445,6 +511,17 @@ export default function App() {
             />
           )}
 
+          {activeTab === 'kms' && (
+            <ServiceActionView
+              eyebrow="Activación Windows"
+              title="KMS"
+              subtitle="Conversión Evaluation y activación KMS reutilizando el motor clásico de Easy Deploy."
+              actions={[{ id: 'kms_run', title: 'KMS', desc: 'Configura el servidor KMS, valida claves y lanza la activación con prompts seguros.', badge: 'KMS', action: 'kms.run' }]}
+              onAppendLog={handleAppendLog}
+              onRunAction={runBackendAction}
+            />
+          )}
+
           {activeTab === 'exchange' && (
             <ExchangeView 
               onAppendLogs={handleAppendMultipleLogs} 
@@ -452,9 +529,45 @@ export default function App() {
             />
           )}
 
+          {activeTab === 'sharepoint' && (
+            <ServiceActionView
+              eyebrow="Servidor Microsoft"
+              title="SharePoint"
+              subtitle="Instalación de prerrequisitos y SharePoint desde recursos offline."
+              actions={[{ id: 'sharepoint_install', title: 'SharePoint', desc: 'Ejecuta la instalación de SharePoint con las validaciones del Easy Deploy clásico.', badge: 'SHAREPOINT', action: 'sharepoint.install' }]}
+              onAppendLog={handleAppendLog}
+              onRunAction={runBackendAction}
+            />
+          )}
+
+          {activeTab === 'sql' && (
+            <ServiceActionView
+              eyebrow="Base de datos"
+              title="SQL"
+              subtitle="Instalación de SQL Server desde recursos offline."
+              actions={[{ id: 'sql_2022', title: 'SQL Server 2022', desc: 'Lanza la instalación de SQL Server 2022/SQL desde el paquete configurado.', badge: 'SQL', action: 'sql.install_2022' }]}
+              onAppendLog={handleAppendLog}
+              onRunAction={runBackendAction}
+            />
+          )}
+
           {activeTab === 'skype' && (
             <SkypeView 
               onAppendLogs={handleAppendMultipleLogs} 
+              onRunAction={runBackendAction}
+            />
+          )}
+
+          {activeTab === 'jchat' && (
+            <ServiceActionView
+              eyebrow="Mensajería interna"
+              title="JCHAT"
+              subtitle="Instalación de Openfire/JCHAT CLI reutilizando recursos offline."
+              actions={[
+                { id: 'jchat_openfire', title: 'Jchat/Openfire', desc: 'Instala Java y Openfire como en Easy Deploy clásico.', badge: 'OPENFIRE', action: 'jchat.openfire' },
+                { id: 'jchat_cli', title: 'Jchat CLI', desc: 'Instala el cliente JCHAT CLI desde el MSI offline.', badge: 'CLI', action: 'jchat.cli' },
+              ]}
+              onAppendLog={handleAppendLog}
               onRunAction={runBackendAction}
             />
           )}
@@ -550,6 +663,51 @@ export default function App() {
           )}
         </div>
       </main>
+
+      {pendingPrompt && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 px-4">
+          <div className="w-full max-w-lg rounded-2xl border p-5 shadow-2xl" style={{ backgroundColor: 'var(--theme-bg-card)', borderColor: 'var(--theme-border-card)', color: 'var(--theme-text-primary)' }}>
+            <h3 className="text-base font-bold mb-2">{String(pendingPrompt.title || 'Easy Deploy')}</h3>
+            <p className="text-sm whitespace-pre-wrap mb-4" style={{ color: 'var(--theme-text-secondary)' }}>{String(pendingPrompt.message || '')}</p>
+            {pendingPrompt.kind === 'confirm' ? (
+              <div className="flex justify-end gap-2">
+                {(pendingPrompt.buttons && pendingPrompt.buttons.length ? pendingPrompt.buttons : [{ text: 'No', value: false }, { text: 'Sí', value: true }]).map((button: any, index: number) => (
+                  <button key={index} onClick={() => finishPrompt(button.value)} className="px-4 py-2 rounded-lg border text-sm font-bold" style={{ backgroundColor: button.value ? 'var(--theme-accent-primary)' : 'var(--theme-bg-well)', borderColor: 'var(--theme-border-well)', color: button.value ? '#fff' : 'var(--theme-text-primary)' }}>
+                    {String(button.text || button.value)}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <form onSubmit={(event) => { event.preventDefault(); finishPrompt(promptValue); }} className="space-y-4">
+                <input
+                  autoFocus
+                  type={pendingPrompt.is_password ? 'password' : 'text'}
+                  value={promptValue}
+                  onChange={(event) => setPromptValue(event.target.value)}
+                  className="w-full px-3 py-2 rounded-lg border bg-transparent text-sm"
+                  style={{ borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)' }}
+                />
+                <div className="flex justify-end gap-2">
+                  <button type="button" onClick={() => finishPrompt(null)} className="px-4 py-2 rounded-lg border text-sm font-bold" style={{ backgroundColor: 'var(--theme-bg-well)', borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)' }}>Cancelar</button>
+                  <button type="submit" className="px-4 py-2 rounded-lg text-sm font-bold" style={{ backgroundColor: 'var(--theme-accent-primary)', color: '#fff' }}>Aceptar</button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+
+      {notification && (
+        <div className="fixed inset-0 z-[998] flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-xl rounded-2xl border p-5 shadow-2xl" style={{ backgroundColor: 'var(--theme-bg-card)', borderColor: 'var(--theme-border-card)', color: 'var(--theme-text-primary)' }}>
+            <h3 className="text-base font-bold mb-2">{notification.title}</h3>
+            <pre className="text-sm whitespace-pre-wrap font-sans max-h-[420px] overflow-auto" style={{ color: 'var(--theme-text-secondary)' }}>{notification.message}</pre>
+            <div className="flex justify-end mt-5">
+              <button onClick={() => setNotification(null)} className="px-4 py-2 rounded-lg text-sm font-bold" style={{ backgroundColor: 'var(--theme-accent-primary)', color: '#fff' }}>Aceptar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

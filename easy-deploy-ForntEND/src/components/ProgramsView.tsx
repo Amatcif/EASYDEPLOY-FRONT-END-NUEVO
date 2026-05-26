@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { DownloadCloud, Play, CheckCircle2, AlertTriangle, ShieldCheck, Sparkles, HelpCircle } from 'lucide-react';
 import { OfflineApp } from '../types';
 import { realActionId } from '../services/actionMap';
@@ -10,6 +10,7 @@ interface ProgramsViewProps {
 
 export default function ProgramsView({ onAppendLog, onRunAction }: ProgramsViewProps) {
   const [apps, setApps] = useState<OfflineApp[]>([
+    { id: 'netfx35', name: 'Net Framework 3.5', version: 'Windows Feature offline', category: 'Prerrequisito', size: 'ISO local', installed: false, status: 'idle', progress: 0 },
     { id: 'firefox', name: 'Mozilla Firefox Standalone', version: '112.0.1 x64', category: 'Navegadores', size: '53.4 MB', installed: false, status: 'idle', progress: 0 },
     { id: 'winrar', name: 'WinRAR Archiver', version: '6.11 Pro x64', category: 'Utilidades', size: '3.2 MB', installed: false, status: 'idle', progress: 0 },
     { id: 'adobe_reader', name: 'Adobe Acrobat Reader DC', version: '22.003 x84', category: 'Ofimática', size: '184 MB', installed: false, status: 'idle', progress: 0 },
@@ -39,18 +40,23 @@ export default function ProgramsView({ onAppendLog, onRunAction }: ProgramsViewP
 
   const handleInstallAll = () => {
     setGlobalInstalling(true);
-    onAppendLog('INSTALLER', 'warning', `[!] REQUERIMIENTO GLOBAL: Iniciando cola de instalación desatendida para 4 aplicaciones offline.`);
-    
-    // Install step sequences
-    apps.forEach((app, idx) => {
-      setTimeout(() => {
-        triggerSilentInstall(app.id);
-      }, idx * 1000);
-    });
+    onAppendLog('INSTALLER', 'warning', `[!] REQUERIMIENTO GLOBAL: Iniciando Instalar todo el arsenal con ${apps.length} componentes offline.`);
+    setApps(prev => prev.map(app => ({ ...app, status: 'preparing', progress: 10 })));
 
-    setTimeout(() => {
-      setGlobalInstalling(false);
-    }, 4500);
+    onRunAction('programs.install_all')
+      .then(() => {
+        setApps(prev => prev.map(app => ({ ...app, status: 'installing', progress: 45 })));
+      })
+      .catch((error) => {
+        onAppendLog('INSTALLER', 'error', `No se pudo iniciar Instalar todo el arsenal: ${String(error)}`);
+        setApps(prev => prev.map(app => ({ ...app, status: 'error', progress: 0 })));
+      })
+      .finally(() => {
+        setTimeout(() => {
+          setApps(prev => prev.map(app => ({ ...app, status: 'idle', progress: 0 })));
+          setGlobalInstalling(false);
+        }, 1500);
+      });
   };
 
   return (
@@ -101,13 +107,13 @@ export default function ProgramsView({ onAppendLog, onRunAction }: ProgramsViewP
         <div>
           <h4 className="text-xs font-bold font-sans uppercase tracking-wide" style={{ color: 'var(--theme-text-primary)' }}>AVISO: DESPLIEGUE MASIVO SIN INTERNET</h4>
           <p className="text-xs leading-relaxed mt-1" style={{ color: 'var(--theme-text-secondary)' }}>
-            Todas las aplicaciones en esta pantalla están alojadas físicamente en la carpeta local <code className="px-1 py-0.5 rounded text-[11px] font-mono" style={{ backgroundColor: 'var(--theme-bg-well)', border: '1px solid var(--theme-border-well)', color: 'var(--theme-accent-primary)' }}>E:\Deploy\Installers\</code>. La estación de trabajo de destino no requiere conexión física a internet WAN ni configuración proxy.
+            Todos los componentes en esta pantalla están alojadas físicamente en la carpeta local <code className="px-1 py-0.5 rounded text-[11px] font-mono" style={{ backgroundColor: 'var(--theme-bg-well)', border: '1px solid var(--theme-border-well)', color: 'var(--theme-accent-primary)' }}>E:\Deploy\Installers\</code>. La estación de trabajo de destino no requiere conexión física a internet WAN ni configuración proxy.
           </p>
         </div>
       </div>
 
       {/* Grid containing apps */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         {apps.map((app) => {
           const isPending = app.status === 'idle';
           const isPrep = app.status === 'preparing';

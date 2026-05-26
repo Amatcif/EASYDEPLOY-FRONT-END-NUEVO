@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { 
   Users, 
   ShieldAlert, 
@@ -28,99 +28,43 @@ export default function DomainControllerView({ onAppendLogs, onClearConsole, onR
       id: 'ad_dc1',
       title: 'Promoción DC1 (Nuevo Bosque)',
       category: 'Configuración de Bosque',
-      desc: 'Levantar un nuevo bosque de Active Directory asignándole el dominio raíz "easydeploy.local" con DNS seguro.',
+      desc: 'Levanta un nuevo bosque de Active Directory con DNS y validaciones del Easy Deploy clásico.',
       accent: 'indigo'
     },
     {
       id: 'ad_dc2',
       title: 'Promoción DC2 (Adicional)',
       category: 'Alta Disponibilidad',
-      desc: 'Sincronizar un controlador adicional replicando SYSVOL, catálogo global y esquemas de Active Directory.',
+      desc: 'Promociona un controlador adicional y replica SYSVOL, catálogo global y esquema de Active Directory.',
       accent: 'indigo'
     },
     {
       id: 'ad_join',
       title: 'Unir equipo a dominio',
       category: 'Dominio',
-      desc: 'Une el equipo al dominio usando las validaciones y prompts del Easy Deploy clásico.',
+      desc: 'Une el equipo al dominio usando las preguntas y validaciones del Easy Deploy clásico.',
       accent: 'indigo'
-    },
-    {
-      id: 'ad_gpo',
-      title: 'Forzar Políticas GPO',
-      category: 'Seguridad',
-      desc: 'Actualizar las directivas locales y forzar reglas de complejidad de contraseñas de seguridad de los controladores.',
-      accent: 'emerald'
     },
     {
       id: 'ad_users',
       title: 'Creación de Usuarios AD',
       category: 'Aprovisionamiento',
-      desc: 'Importar y registrar en lote de forma automatizada las 18 cuentas del personal con OUs y grupos específicos.',
-      accent: 'emerald'
-    },
-    {
-      id: 'ad_netfx35',
-      title: 'Net Framework 3.5',
-      category: 'Prerequisito',
-      desc: 'Instala NET-Framework-Core desde la ISO local de recursos configurada en Easy Deploy.',
+      desc: 'Abre los prompts del bridge para crear usuarios AD con datos introducidos por el técnico.',
       accent: 'emerald'
     },
     {
       id: 'ad_repadmin',
       title: 'Repadmin Health Check',
-      category: 'Monitoreo de Red',
-      desc: 'Analizar vecinos de replicación del bosque para comprobar errores de RPC, SID, o latencias de replicaciones AD DB.',
+      category: 'Replicación',
+      desc: 'Analiza la replicación del bosque con Repadmin y muestra la salida real en consola.',
       accent: 'sky'
     },
     {
       id: 'ad_d2_d4',
       title: 'D2/D4 Autoritative Restore',
-      category: 'Recuperación de Desastres',
-      desc: 'Modificar BurFlags en el registro de Windows de sysvol para solucionar corrupción de replicación de Archivos (NtFrs).',
+      category: 'Recuperación',
+      desc: 'Asistente de recuperación SYSVOL/DFSR usando BurFlags D2/D4 según la acción indicada.',
       accent: 'rose'
-    },
-    {
-      id: 'system_time_sync',
-      title: 'Sincronizar hora',
-      category: 'Sistema',
-      desc: 'Sincroniza la hora del servidor usando la tarea clásica de Easy Deploy.',
-      accent: 'sky'
-    },
-    {
-      id: 'system_kms',
-      title: 'KMS',
-      category: 'Activación Windows',
-      desc: 'Convierte Evaluation cuando aplica y configura activación KMS con confirmación previa.',
-      accent: 'rose'
-    },
-    {
-      id: 'system_sql',
-      title: 'SQL Server',
-      category: 'Servidor',
-      desc: 'Instala drivers, SSMS y lanza la ISO de SQL Server desde los recursos offline.',
-      accent: 'indigo'
-    },
-    {
-      id: 'system_jchat',
-      title: 'JCHAT / Openfire',
-      category: 'Colaboración',
-      desc: 'Instala Java y Openfire reutilizando los instaladores offline del Easy Deploy clásico.',
-      accent: 'emerald'
-    },
-    {
-      id: 'system_jchat_cli',
-      title: 'JCHAT CLI',
-      category: 'Cliente',
-      desc: 'Instala el MSI offline del cliente JCHAT CLI.',
-      accent: 'emerald'
-    },
-    {
-      id: 'system_sharepoint_install',
-      title: 'SharePoint',
-      category: 'Servidor',
-      desc: 'Instala prerrequisitos y ejecuta SharePoint desde los recursos configurados.',
-      accent: 'sky'
     }
   ];
 
@@ -270,51 +214,7 @@ export default function DomainControllerView({ onAppendLogs, onClearConsole, onR
         })}
       </div>
 
-      {/* Diagnostic tools bar & AD Explorer list */}
-      <div 
-        className="p-5 rounded-xl border"
-        style={{
-          backgroundColor: 'var(--theme-bg-card)',
-          borderColor: 'var(--theme-border-card)',
-          color: 'var(--theme-text-primary)'
-        }}
-      >
-        <div className="flex justify-between items-center border-b pb-3 mb-4" style={{ borderColor: 'var(--theme-border-well)' }}>
-          <div>
-            <h3 className="text-xs font-bold font-mono uppercase tracking-widest" style={{ color: 'var(--theme-text-primary)' }}>Sincronización y Directorio</h3>
-            <p className="text-[11px]" style={{ color: 'var(--theme-text-secondary)' }}>Metadatos de objetos registrados localmente en este servidor</p>
-          </div>
-          <span 
-            className="border font-mono font-bold text-[10px] px-2.5 py-0.5 rounded"
-            style={{
-              backgroundColor: 'var(--theme-bg-well)',
-              borderColor: 'var(--theme-border-well)',
-              color: 'var(--theme-accent-primary)'
-            }}
-          >
-            DB Saludable (NTDS.DIT)
-          </span>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
-          <div className="p-3 rounded-lg border" style={{ backgroundColor: 'var(--theme-bg-well)', borderColor: 'var(--theme-border-well)' }}>
-            <span className="text-[10px] uppercase font-bold font-mono block mb-0.5" style={{ color: 'var(--theme-text-secondary)' }}>Grupos Globales</span>
-            <span className="text-lg font-bold font-mono" style={{ color: 'var(--theme-accent-primary)' }}>14</span>
-          </div>
-          <div className="p-3 rounded-lg border" style={{ backgroundColor: 'var(--theme-bg-well)', borderColor: 'var(--theme-border-well)' }}>
-            <span className="text-[10px] uppercase font-bold font-mono block mb-0.5" style={{ color: 'var(--theme-text-secondary)' }}>Unidades Org</span>
-            <span className="text-lg font-bold font-mono" style={{ color: '#10b981' }}>6</span>
-          </div>
-          <div className="p-3 rounded-lg border" style={{ backgroundColor: 'var(--theme-bg-well)', borderColor: 'var(--theme-border-well)' }}>
-            <span className="text-[10px] uppercase font-bold font-mono block mb-0.5" style={{ color: 'var(--theme-text-secondary)' }}>Cuentas Importadas</span>
-            <span className="text-lg font-bold font-mono" style={{ color: 'var(--theme-accent-primary)' }}>18 / 18</span>
-          </div>
-          <div className="p-3 rounded-lg border" style={{ backgroundColor: 'var(--theme-bg-well)', borderColor: 'var(--theme-border-well)' }}>
-            <span className="text-[10px] uppercase font-bold font-mono block mb-0.5" style={{ color: 'var(--theme-text-secondary)' }}>Maestro FSMO</span>
-            <span className="text-xs font-black font-mono block truncate" style={{ color: 'var(--theme-accent-primary)' }} title="EasyDeploy-DC1">EasyDeploy-DC1</span>
-          </div>
-        </div>
-      </div>
+
     </div>
   );
 }
