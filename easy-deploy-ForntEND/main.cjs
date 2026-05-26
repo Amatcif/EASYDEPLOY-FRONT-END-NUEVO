@@ -458,6 +458,12 @@ ipcMain.handle('backend:getStatus', async () => {
   };
 });
 
+ipcMain.handle('app:quit', async () => {
+  writeMainLog('info', 'Cierre solicitado por actualizador desde renderer.');
+  setTimeout(() => app.quit(), 250);
+  return { ok: true };
+});
+
 ipcMain.handle('app:getInfo', async () => {
   return {
     name: 'EASY DEPLOY',

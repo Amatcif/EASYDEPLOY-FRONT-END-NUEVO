@@ -1,4 +1,4 @@
-﻿import type { BackendApi, BackendEvent } from '../types/backend';
+import type { BackendApi, BackendEvent } from '../types/backend';
 
 const demoEvents = new EventTarget();
 
@@ -105,6 +105,14 @@ export const backendClient = {
       return bridge.getAppInfo();
     }
     return Promise.resolve({ name: 'Easy Deploy', version: 'demo', mode: 'browser-demo' });
+  },
+
+  quitApp() {
+    const bridge = getBridge();
+    if (bridge?.quitApp) {
+      return bridge.quitApp();
+    }
+    return Promise.resolve({ ok: false, error: 'quitApp no expuesto' });
   },
 
   pingPreload() {

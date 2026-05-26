@@ -210,7 +210,7 @@ export default function NetworksView({ onAppendLog, onRunAction }: NetworksViewP
                 <p className="text-[11px] leading-normal mb-4" style={{ color: 'var(--theme-text-secondary)' }}>{card.description}</p>
               </div>
               <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider mt-auto select-none" style={{ color: 'var(--theme-accent-primary)' }}>
-                <span>Ver detalles</span>
+                <span>Abrir consola</span>
                 <ChevronRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
               </div>
             </div>

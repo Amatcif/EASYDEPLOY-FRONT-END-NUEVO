@@ -6,6 +6,18 @@ export interface ChangelogItem {
 
 export const changelogData: ChangelogItem[] = [
   {
+    version: '2.2.5.25',
+    date: '26/05/2026',
+    changes: [
+      'Pulida pestaña Actualizaciones: ocultadas URL/SHA/instalador, añadida barra de descarga y flujo descargar-instalar-cerrar.',
+      'Corregidos avisos de Privilegios y confirmación al cambiar el endpoint update.json.',
+      'Mejorado el foco de prompts React para KMS, AD, Exchange, dominio y entradas antiguas.',
+      'La consola limpia la salida al iniciar una tarea nueva y añade acceso directo a Logs.',
+      'Mejorado Monitor de ping con estados verde/rojo/gris y botón X para cerrar cada ping.',
+      'Reforzada apertura de Logs y herramientas interactivas de red desde el backend real.'
+    ]
+  },
+  {
     version: '2.2.5.24',
     date: '26/05/2026',
     changes: [

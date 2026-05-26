@@ -1,4 +1,5 @@
 import React from 'react';
+import { FolderOpen } from 'lucide-react';
 import ConsolePanel from './ConsolePanel';
 
 interface DeploymentConsoleViewProps {
@@ -7,6 +8,7 @@ interface DeploymentConsoleViewProps {
   onExecuteCommand: (cmd: string) => void;
   onAppendLog: (source: string, type: 'info' | 'success' | 'warning' | 'error', message: string) => void;
   backendProgress?: number;
+  onOpenLogs?: () => void;
 }
 
 export default function DeploymentConsoleView({
@@ -14,6 +16,7 @@ export default function DeploymentConsoleView({
   onClearConsole,
   onExecuteCommand,
   backendProgress = 0,
+  onOpenLogs,
 }: DeploymentConsoleViewProps) {
   const progress = Math.max(0, Math.min(100, backendProgress));
 
@@ -38,9 +41,20 @@ export default function DeploymentConsoleView({
             Panel para ver ejecuciones reales del backend Python, prompts, progreso y logs en vivo.
           </p>
         </div>
-        <span className="text-2xl font-black font-mono" style={{ color: 'var(--theme-accent-primary)' }}>
-          {progress}%
-        </span>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onOpenLogs}
+            className="px-3 py-2 rounded-lg border text-xs font-bold flex items-center gap-2"
+            style={{ backgroundColor: 'var(--theme-bg-well)', borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)' }}
+          >
+            <FolderOpen size={14} style={{ color: 'var(--theme-accent-primary)' }} />
+            Logs
+          </button>
+          <span className="text-2xl font-black font-mono" style={{ color: 'var(--theme-accent-primary)' }}>
+            {progress}%
+          </span>
+        </div>
       </div>
 
       <div

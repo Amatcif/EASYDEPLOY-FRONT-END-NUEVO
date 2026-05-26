@@ -22,6 +22,9 @@ function createBackendApi() {
     getAppInfo() {
       return ipcRenderer.invoke('app:getInfo');
     },
+    quitApp() {
+      return ipcRenderer.invoke('app:quit');
+    },
     async pingPreload() {
       const mainPing = await ipcRenderer.invoke('preload:ping');
       return {

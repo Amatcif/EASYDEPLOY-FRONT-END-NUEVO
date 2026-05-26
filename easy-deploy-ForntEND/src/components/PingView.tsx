@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Activity, BookmarkPlus, Play, Square, Trash2 } from 'lucide-react';
+import { Activity, BookmarkPlus, Play, Square, Trash2, X } from 'lucide-react';
 
 interface PingFavorite {
   name?: string;
@@ -32,6 +32,13 @@ function asFavorites(value: unknown): PingFavorite[] {
       host: String((item as Record<string, unknown>)?.host || ''),
     }))
     .filter((item) => item.host);
+}
+
+function statusFor(card: PingCard) {
+  if (!card.running) return { label: 'Parado', color: '#94a3b8' };
+  if (card.ok === true) return { label: 'Correcto', color: '#10b981' };
+  if (card.ok === false) return { label: 'Error', color: '#ef4444' };
+  return { label: 'Esperando', color: '#94a3b8' };
 }
 
 export default function PingView({ onAppendLog, onRunAction, favoritesData, lastPingResult }: PingViewProps) {
@@ -77,6 +84,11 @@ export default function PingView({ onAppendLog, onRunAction, favoritesData, last
     if (timer) clearInterval(timer);
     timers.current.delete(id);
     setCards((prev) => prev.map((card) => card.id === id ? { ...card, running: false } : card));
+  };
+
+  const removePing = (id: string) => {
+    stopPing(id);
+    setCards((prev) => prev.filter((card) => card.id !== id));
   };
 
   const startPing = (card: PingCard) => {
@@ -127,10 +139,7 @@ export default function PingView({ onAppendLog, onRunAction, favoritesData, last
 
   return (
     <div className="space-y-6">
-      <div
-        className="border rounded-2xl p-5"
-        style={{ backgroundColor: 'var(--theme-bg-card)', borderColor: 'var(--theme-border-card)' }}
-      >
+      <div className="border rounded-2xl p-5" style={{ backgroundColor: 'var(--theme-bg-card)', borderColor: 'var(--theme-border-card)' }}>
         <div className="flex items-center gap-3">
           <Activity size={22} style={{ color: 'var(--theme-accent-primary)' }} />
           <div>
@@ -144,10 +153,7 @@ export default function PingView({ onAppendLog, onRunAction, favoritesData, last
 
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-5">
         <div className="space-y-5">
-          <div
-            className="border rounded-2xl p-5 grid grid-cols-1 md:grid-cols-[1fr_1fr_110px_auto_auto] gap-3 items-end"
-            style={{ backgroundColor: 'var(--theme-bg-card)', borderColor: 'var(--theme-border-card)' }}
-          >
+          <div className="border rounded-2xl p-5 grid grid-cols-1 md:grid-cols-[1fr_1fr_110px_auto_auto] gap-3 items-end" style={{ backgroundColor: 'var(--theme-bg-card)', borderColor: 'var(--theme-border-card)' }}>
             <label className="space-y-1">
               <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--theme-text-secondary)' }}>IP o nombre DNS</span>
               <input value={host} onChange={(event) => setHost(event.target.value)} className="w-full px-3 py-2 rounded-lg border text-sm bg-transparent" style={{ borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)' }} />
@@ -169,26 +175,43 @@ export default function PingView({ onAppendLog, onRunAction, favoritesData, last
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {cards.map((card) => (
-              <div key={card.id} className="border rounded-2xl p-4 space-y-3" style={{ backgroundColor: 'var(--theme-bg-card)', borderColor: 'var(--theme-border-card)' }}>
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h3 className="text-sm font-bold" style={{ color: 'var(--theme-text-primary)' }}>{card.name}</h3>
-                    <p className="text-xs font-mono" style={{ color: 'var(--theme-text-secondary)' }}>{card.host}</p>
+            {cards.map((card) => {
+              const status = statusFor(card);
+              return (
+                <div
+                  key={card.id}
+                  className="border rounded-2xl p-4 space-y-3 relative overflow-hidden"
+                  style={{ backgroundColor: 'var(--theme-bg-card)', borderColor: status.color }}
+                >
+                  <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: status.color }} />
+                  <div className="flex items-start justify-between gap-3 pl-1">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: status.color }} />
+                        <h3 className="text-sm font-bold" style={{ color: 'var(--theme-text-primary)' }}>{card.name}</h3>
+                      </div>
+                      <p className="text-xs font-mono mt-1" style={{ color: 'var(--theme-text-secondary)' }}>{card.host} · {status.label}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removePing(card.id)}
+                      className="w-8 h-8 rounded-lg border flex items-center justify-center font-bold"
+                      title="Cerrar este ping"
+                      style={{ borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)', backgroundColor: 'var(--theme-bg-well)' }}
+                    >
+                      <X size={15} />
+                    </button>
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-1 rounded border" style={{ borderColor: 'var(--theme-border-well)', color: card.ok ? '#10b981' : card.ok === false ? '#ef4444' : 'var(--theme-text-secondary)' }}>
-                    {card.ok ? 'OK' : card.ok === false ? 'ERROR' : 'PENDIENTE'}
-                  </span>
+                  <pre className="text-[11px] leading-relaxed max-h-40 overflow-auto whitespace-pre-wrap rounded-xl p-3 border" style={{ backgroundColor: 'var(--theme-bg-well)', borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)' }}>{card.lastOutput}</pre>
+                  <div className="flex items-center justify-between text-[10px]" style={{ color: 'var(--theme-text-secondary)' }}>
+                    <span>Última comprobación: {card.lastChecked}</span>
+                    <button onClick={() => card.running ? stopPing(card.id) : startPing(card)} className="px-3 py-1.5 rounded-lg border flex items-center gap-1.5" style={{ borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)' }}>
+                      {card.running ? <Square size={11} /> : <Play size={11} fill="currentColor" />} {card.running ? 'Parar' : 'Iniciar'}
+                    </button>
+                  </div>
                 </div>
-                <pre className="text-[11px] leading-relaxed max-h-40 overflow-auto whitespace-pre-wrap rounded-xl p-3 border" style={{ backgroundColor: 'var(--theme-bg-well)', borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)' }}>{card.lastOutput}</pre>
-                <div className="flex items-center justify-between text-[10px]" style={{ color: 'var(--theme-text-secondary)' }}>
-                  <span>Última comprobación: {card.lastChecked}</span>
-                  <button onClick={() => card.running ? stopPing(card.id) : startPing(card)} className="px-3 py-1.5 rounded-lg border flex items-center gap-1.5" style={{ borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)' }}>
-                    {card.running ? <Square size={11} /> : <Play size={11} fill="currentColor" />} {card.running ? 'Parar' : 'Iniciar'}
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 

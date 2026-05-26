@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ActiveTab, SystemLog, WindowsRegistry } from './types';
 import Sidebar from './components/Sidebar';
 import DashboardView from './components/DashboardView';
@@ -47,10 +47,11 @@ export default function App() {
   const [backendData, setBackendData] = useState<Record<string, unknown>>({});
   const [pendingPrompt, setPendingPrompt] = useState<BackendEvent | null>(null);
   const [promptValue, setPromptValue] = useState('');
+  const promptInputRef = useRef<HTMLInputElement>(null);
   const [notification, setNotification] = useState<{ title: string; message: string; level: 'info' | 'success' | 'warning' | 'error' } | null>(null);
 
   const remainingDays = 7 - Math.min(registry.Dias_Transcurridos, 7);
-  const displayedVersion = String(appInfo.version || '2.2.5.24');
+  const displayedVersion = String(appInfo.version || '2.2.5.25');
 
   useEffect(() => {
     localStorage.setItem('premium-theme', theme);
@@ -58,7 +59,7 @@ export default function App() {
   
   // Custom console logs
   const [logs, setLogs] = useState<string[]>([
-    'Easy Deploy Orchestrator [v2.2.5.24]',
+    'Easy Deploy Orchestrator [v2.2.5.25]',
     'Copyright (C) 2026 Easy Deploy. Todos los derechos reservados.',
     '',
     '[BOOT] [i] Cargando front-end React/Electron...',
@@ -116,6 +117,16 @@ ${missing.length ? missing.map((item) => `- ${item}`).join('\n') : '- No se pudo
     setPendingPrompt(null);
     setPromptValue('');
   };
+
+
+  useEffect(() => {
+    if (!pendingPrompt || pendingPrompt.kind === 'confirm') return;
+    const timer = window.setTimeout(() => {
+      promptInputRef.current?.focus();
+      promptInputRef.current?.select();
+    }, 100);
+    return () => window.clearTimeout(timer);
+  }, [pendingPrompt]);
 
   useEffect(() => {
     const detectedApis = getDetectedBridgeApis();
@@ -214,13 +225,22 @@ ${missing.length ? missing.map((item) => `- ${item}`).join('\n') : '- No se pudo
             level: report.complete === true ? 'success' : 'warning',
           });
         }
+        if (event.action === 'dashboard.check_admin' && event.result && typeof event.result === 'object') {
+          const admin = (event.result as Record<string, unknown>).admin === true;
+          setNotification({
+            title: admin ? 'Privilegios de administrador' : 'Sin privilegios de administrador',
+            message: admin
+              ? 'Easy Deploy se está ejecutando con privilegios de Administrador.'
+              : 'Easy Deploy NO se está ejecutando con privilegios de Administrador. Cierra la aplicación y usa “Ejecutar como administrador”.',
+            level: admin ? 'success' : 'warning',
+          });
+        }
         setLogs(prev => [...prev, `[${event.action || 'BACKEND'}] ${event.success ? '[OK]' : '[ERROR]'} Acción finalizada.`]);
       }
     });
   }, []);
 
   const runBackendAction = async (action: string, payload: Record<string, unknown> = {}) => {
-    setLogs(prev => [...prev, `[CLIENT] Ejecutando acción real: ${action}`]);
     const confirmRequired = new Set([
       'ad.dc1',
       'ad.dc2',
@@ -294,10 +314,23 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
       'ping.favorites',
       'ping.add_favorite',
       'ping.delete_favorite',
+      'dashboard.ping',
     ]);
     const shouldOpenConsole = !stayOnPage && !noConsoleActions.has(action) && !action.startsWith('updates.') && !action.startsWith('activation.');
+    const header = [
+      `Easy Deploy Orchestrator [v${displayedVersion}]`,
+      `Nueva tarea: ${action}`,
+      `Inicio: ${new Date().toLocaleString()}`,
+      '',
+      `[CLIENT] Ejecutando acción real: ${action}`,
+    ];
+
+    setBackendProgress(0);
     if (shouldOpenConsole) {
+      setLogs(header);
       setActiveTab('deployment_console');
+    } else {
+      setLogs(prev => [...prev, `[CLIENT] Ejecutando acción real: ${action}`]);
     }
     return backendClient.runAction(action, payload);
   };
@@ -585,7 +618,10 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
                 onAppendLog={handleAppendLog} 
                 onRunAction={runBackendAction}
                 updateData={backendData['updates.check'] as Record<string, unknown> | undefined}
+                downloadData={(backendData['updates.downloaded'] || backendData['updates.download']) as Record<string, unknown> | undefined}
+                backendProgress={backendProgress}
                 appVersion={displayedVersion}
+                onQuitApp={() => backendClient.quitApp()}
               />
               <ActivationView 
                 registry={registry}
@@ -635,6 +671,7 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
               onExecuteCommand={handleExecuteCommand} 
               onAppendLog={handleAppendLog}
               backendProgress={backendProgress}
+              onOpenLogs={() => runBackendAction('dashboard.open_logs', { stayOnPage: true })}
             />
           )}
 
@@ -680,6 +717,7 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
             ) : (
               <form onSubmit={(event) => { event.preventDefault(); finishPrompt(promptValue); }} className="space-y-4">
                 <input
+                  ref={promptInputRef}
                   autoFocus
                   type={pendingPrompt.is_password ? 'password' : 'text'}
                   value={promptValue}

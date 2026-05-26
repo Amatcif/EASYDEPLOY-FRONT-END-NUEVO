@@ -29,6 +29,7 @@ export interface BackendApi {
   getAppInfo?: () => Promise<Record<string, unknown> | unknown>;
   getBackendStatus?: () => Promise<Record<string, unknown> | unknown>;
   pingPreload?: () => Promise<Record<string, unknown> | unknown>;
+  quitApp?: () => Promise<Record<string, unknown> | unknown>;
 }
 
 declare global {
