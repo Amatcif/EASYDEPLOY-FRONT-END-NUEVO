@@ -1,0 +1,23 @@
+﻿# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+
+# Build outputs
+build/
+dist/
+*.log
+*.tmp
+
+# OS/editor
+Thumbs.db
+.DS_Store
+
+# Secrets/certificates
+.env
+*.key
+*.pem
+*.pfx

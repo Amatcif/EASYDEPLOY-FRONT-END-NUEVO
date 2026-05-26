@@ -1,0 +1,39 @@
+COMANDO ACTUAL PARA CREAR EASY DEPLOY
+=====================================
+
+OPCION RECOMENDADA CON EL .BAT
+------------------------------
+
+Ejecuta desde PowerShell:
+
+cd "C:\Users\amatc\Desktop\PROYECTOS\EASYDEPLOY\Proyecto Phyton\APLICACION\Crear .EXE"
+.\build_easy_deploy_seguro.bat
+
+
+COMANDO DIRECTO PARA POWERSHELL
+-------------------------------
+
+Si alguna vez no puedes usar el .bat, ejecuta directamente este comando en PowerShell:
+
+& "C:\Users\amatc\AppData\Local\Programs\Python\Python314\python.exe" -m PyInstaller --clean --noconfirm --upx-dir "C:\Users\amatc\Desktop\PROYECTOS\EASYDEPLOY\Proyecto Phyton\APLICACION" "C:\Users\amatc\Desktop\PROYECTOS\EASYDEPLOY\Proyecto Phyton\APLICACION\EASY DEPLOY.spec"
+
+
+QUE USA ESTE COMANDO
+--------------------
+
+- Spec principal: C:\Users\amatc\Desktop\PROYECTOS\EASYDEPLOY\Proyecto Phyton\APLICACION\EASY DEPLOY.spec
+- Archivo principal: C:\Users\amatc\Desktop\PROYECTOS\EASYDEPLOY\Proyecto Phyton\APLICACION\EASY DEPLOY.py
+- Iconos desde: C:\Users\amatc\Desktop\PROYECTOS\EASYDEPLOY\Proyecto Phyton\APLICACION\iconos
+- Herramientas de red desde: C:\Users\amatc\Desktop\PROYECTOS\EASYDEPLOY\Proyecto Phyton\APLICACION\easy_deploy_app\network_tools
+- Licencia de build: C:\Users\amatc\Desktop\PROYECTOS\EASYDEPLOY\Proyecto Phyton\APLICACION\tools\stamp_license_build.py
+- UPX: C:\Users\amatc\Desktop\PROYECTOS\EASYDEPLOY\Proyecto Phyton\APLICACION\upx.exe
+
+
+RESULTADO
+---------
+
+El ejecutable final queda en:
+
+C:\Users\amatc\Desktop\PROYECTOS\EASYDEPLOY\Proyecto Phyton\APLICACION\dist\EASY DEPLOY.exe
+
+El ejecutable no incluye las ISOs, instaladores grandes ni guias PDF. Easy Deploy busca automaticamente EXCHANGE, SHAPRE, SQL, JCHAT, OTROS y GUIAS en una carpeta "EASY DEPLOY" o "EASYDEPLOY" junto al ejecutable, junto a APLICACION o en el Escritorio.

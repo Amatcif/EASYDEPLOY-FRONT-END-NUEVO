@@ -1,0 +1,22 @@
+appId: com.easydeploy.prototype
+productName: Easy Deploy Electron Prototype
+asar: true
+directories:
+  output: dist_desktop
+files:
+  - dist/**/*
+  - main.cjs
+  - preload.js
+  - package.json
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  requestedExecutionLevel: asInvoker
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true

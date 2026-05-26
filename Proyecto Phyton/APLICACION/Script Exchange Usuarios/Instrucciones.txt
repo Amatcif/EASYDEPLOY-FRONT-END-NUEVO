@@ -1,0 +1,18 @@
+Easy Deploy usa esta carpeta como zona temporal para Crear usuarios EXC.
+
+Uso recomendado:
+1. Abre Easy Deploy dentro de la MV donde Exchange ya este instalado.
+2. Entra en Sistemas > Exchange > Crear usuarios EXC.
+3. Introduce el primer usuario con email completo, FirstName, OrganizationalUnit y password.
+4. En OrganizationalUnit usa preferiblemente el formato dominio/Users. Ejemplo: et.ms.esp/Users.
+   Si escribes solo ET, Users o User, Easy Deploy lo normaliza automaticamente al contenedor CN=Users del dominio del email.
+5. Reutiliza dominio, OrganizationalUnit y password para dar de alta usuarios mas rapido.
+6. Pulsa Terminar y ejecutar.
+
+Cambio importante de esta version:
+- Easy Deploy crea primero el usuario real en Active Directory con New-ADUser.
+- Despues habilita el buzon con Enable-Mailbox.
+- Usa el PDC Emulator o un DC escribible del dominio para que el objeto se vea en ADUC con menos problemas de replicacion.
+- Al finalizar intenta solicitar sincronizacion AD con repadmin si esta disponible.
+
+Los archivos matriz_usuarios.csv y Script_exchange.ps1 quedan como referencia manual.
