@@ -1,10 +1,10 @@
 {
   "name": "easy-deploy",
   "private": true,
-  "version": "2.2.5-27",
-  "easyDeployVersion": "2.2.5.27",
+  "version": "2.2.5-28",
+  "easyDeployVersion": "2.2.5.28",
   "main": "main.cjs",
-  "description": "Easy Deploy desktop frontend with Python bridge",
+  "description": "EasyDeploy",
   "author": "Easy Deploy",
   "type": "commonjs",
   "scripts": {

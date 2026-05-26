@@ -93,18 +93,36 @@ function candidateBackendExecutables() {
   if (app.isPackaged) {
     candidates.push({
       label: 'packaged-extraResources',
+      command: path.join(process.resourcesPath || '', 'backend', 'EasyDeploy back.exe'),
+      args: [],
+      cwd: appInstallDir(),
+    });
+    candidates.push({
+      label: 'packaged-extraResources-legacy',
       command: path.join(process.resourcesPath || '', 'backend', 'easydeploy_backend.exe'),
       args: [],
       cwd: appInstallDir(),
     });
     candidates.push({
       label: 'packaged-beside-exe',
+      command: path.join(appInstallDir(), 'backend', 'EasyDeploy back.exe'),
+      args: [],
+      cwd: appInstallDir(),
+    });
+    candidates.push({
+      label: 'packaged-beside-exe-legacy',
       command: path.join(appInstallDir(), 'backend', 'easydeploy_backend.exe'),
       args: [],
       cwd: appInstallDir(),
     });
     candidates.push({
       label: 'packaged-resources-root',
+      command: path.join(process.resourcesPath || '', 'EasyDeploy back.exe'),
+      args: [],
+      cwd: appInstallDir(),
+    });
+    candidates.push({
+      label: 'packaged-resources-root-legacy',
       command: path.join(process.resourcesPath || '', 'easydeploy_backend.exe'),
       args: [],
       cwd: appInstallDir(),
@@ -113,6 +131,12 @@ function candidateBackendExecutables() {
 
   candidates.push({
     label: 'local-backend-dist',
+    command: path.join(__dirname, 'backend_dist', 'EasyDeploy back.exe'),
+    args: [],
+    cwd: __dirname,
+  });
+  candidates.push({
+    label: 'local-backend-dist-legacy',
     command: path.join(__dirname, 'backend_dist', 'easydeploy_backend.exe'),
     args: [],
     cwd: __dirname,
@@ -184,6 +208,16 @@ function sendToRenderer(event) {
     id: payload.id,
   });
   if (mainWindow && !mainWindow.isDestroyed()) {
+    if (payload.type === 'prompt') {
+      try {
+        if (mainWindow.isMinimized()) mainWindow.restore();
+        mainWindow.show();
+        mainWindow.focus();
+        mainWindow.webContents.focus();
+      } catch (error) {
+        writeMainLog('warning', 'No se pudo enfocar ventana para prompt.', { error: String(error) });
+      }
+    }
     if (rendererReady) {
       mainWindow.webContents.send('backend:event', payload);
     } else {
@@ -331,7 +365,7 @@ function createWindow() {
     height: 800,
     minWidth: 1024,
     minHeight: 700,
-    title: 'EASY DEPLOY',
+    title: 'EasyDeploy',
     autoHideMenuBar: true,
     webPreferences: {
       preload: preloadPath,
@@ -480,6 +514,21 @@ ipcMain.handle('backend:respondPrompt', async (_event, promptId, value) => {
   }
 });
 
+ipcMain.handle('backend:sendConsoleInput', async (_event, value) => {
+  try {
+    postToBackend({ type: 'console_input', value });
+    return true;
+  } catch (error) {
+    sendToRenderer({
+      type: 'error',
+      source: 'BRIDGE',
+      level: 'error',
+      message: `No se pudo enviar entrada interactiva: ${String(error && error.message ? error.message : error)}`,
+    });
+    return false;
+  }
+});
+
 ipcMain.handle('backend:getStatus', async () => {
   return {
     running: Boolean(backendProcess && !backendProcess.killed),
@@ -498,7 +547,7 @@ ipcMain.handle('app:quit', async () => {
 
 ipcMain.handle('app:getInfo', async () => {
   return {
-    name: 'EASY DEPLOY',
+    name: 'EasyDeploy',
     version: packageMetadata.easyDeployVersion || app.getVersion(),
     packaged: app.isPackaged,
     backendCwd: projectBackendCwd(),

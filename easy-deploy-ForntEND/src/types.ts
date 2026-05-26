@@ -1,8 +1,10 @@
 export type ActiveTab =
   | 'dashboard'
   | 'ad'
+  | 'ad_users_form'
   | 'kms'
   | 'exchange'
+  | 'exchange_users_form'
   | 'sharepoint'
   | 'sql'
   | 'skype'

@@ -13,14 +13,16 @@ import {
   Sparkles
 } from 'lucide-react';
 import { realActionId } from '../services/actionMap';
+import type { ActiveTab } from '../types';
 
 interface DomainControllerViewProps {
   onAppendLogs: (logs: string[]) => void;
   onClearConsole: () => void;
   onRunAction: (action: string, payload?: Record<string, unknown>) => Promise<unknown>;
+  onSetTab: (tab: ActiveTab) => void;
 }
 
-export default function DomainControllerView({ onAppendLogs, onClearConsole, onRunAction }: DomainControllerViewProps) {
+export default function DomainControllerView({ onAppendLogs, onClearConsole, onRunAction, onSetTab }: DomainControllerViewProps) {
   const [activeTask, setActiveTask] = useState<string | null>(null);
 
   const adActions = [
@@ -69,6 +71,10 @@ export default function DomainControllerView({ onAppendLogs, onClearConsole, onR
   ];
 
   const handleExecuteAction = (actionId: string, title: string) => {
+    if (actionId === 'ad_users') {
+      onSetTab('ad_users_form');
+      return;
+    }
     setActiveTask(actionId);
     onAppendLogs([
       `[CLIENT] Ejecutando utilidad de Active Directory: "${title}" ...`,

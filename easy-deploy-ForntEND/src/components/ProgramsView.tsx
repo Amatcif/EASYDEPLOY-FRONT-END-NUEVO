@@ -22,7 +22,7 @@ export default function ProgramsView({ onAppendLog, onRunAction }: ProgramsViewP
   const triggerSilentInstall = (appId: string) => {
     const selected = apps.find(app => app.id === appId);
     setApps(prev => prev.map(app => app.id === appId ? { ...app, status: 'preparing', progress: 10 } : app));
-    onAppendLog('INSTALLER', 'info', `Enviando instalación real al backend Python: ${selected?.name || appId}`);
+    onAppendLog('INSTALLER', 'info', `Enviando instalación real al backend Python: ${selected.name || appId}`);
     onRunAction(realActionId(appId))
       .then(() => {
         setApps(prev => prev.map(app => app.id === appId ? { ...app, status: 'installing', progress: 45 } : app));
@@ -177,8 +177,8 @@ export default function ProgramsView({ onAppendLog, onRunAction }: ProgramsViewP
                     onClick={() => triggerSilentInstall(app.id)}
                     disabled={app.status !== 'idle' && app.status !== 'completed'}
                     className={`px-3 py-1 bg-slate-950 hover:bg-slate-850 rounded border border-slate-800 text-[11px] font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-                      isCompleted 
-                        ? 'text-emerald-400 border-emerald-950 hover:bg-slate-900' 
+                      isCompleted ?
+                         'text-emerald-400 border-emerald-950 hover:bg-slate-900' 
                         : 'text-indigo-400'
                     }`}
                     style={isCompleted ? {

@@ -4,11 +4,14 @@ import { Terminal, Copy, Trash2, Play, Ban } from 'lucide-react';
 interface ConsolePanelProps {
   logs: string[];
   onClear: () => void;
-  onExecuteCommand?: (cmd: string) => void;
+  onExecuteCommand: (cmd: string) => void;
   title?: string;
   className?: string;
   activeAction?: string | null;
   onCancelTask?: () => void;
+  inputEnabled?: boolean;
+  inputPlaceholder?: string;
+  inputSensitive?: boolean;
 }
 
 export default function ConsolePanel({ 
@@ -19,6 +22,9 @@ export default function ConsolePanel({
   className = "h-[320px]",
   activeAction = null,
   onCancelTask,
+  inputEnabled = false,
+  inputPlaceholder = "Escribe 'help' para ver comandos, o responde a la tarea interactiva...",
+  inputSensitive = false,
 }: ConsolePanelProps) {
   const [inputVal, setInputVal] = useState('');
   const [history, setHistory] = useState<string[]>([]);
@@ -26,7 +32,7 @@ export default function ConsolePanel({
   const terminalEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    terminalEndRef.current.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -147,16 +153,18 @@ export default function ConsolePanel({
           <span className="text-slate-400 font-mono text-xs">C:\Deploy&gt;</span>
         </span>
         <input
-          type="text"
+          type={inputSensitive ? 'password' : 'text'}
           value={inputVal}
           onChange={(e) => setInputVal(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Escribe 'help' para ver comandos, o ensaya comandos personalizados..."
+          placeholder={inputEnabled ? inputPlaceholder : "Escribe 'help' para ver comandos, o ensaya comandos personalizados..."}
           className="bg-transparent text-slate-100 flex-1 outline-none font-mono text-xs w-full py-1 caret-emerald-500 placeholder-slate-600 focus:placeholder-slate-500"
           id="terminal-input"
         />
         <div className="flex items-center gap-1.5 pr-2 shrink-0">
-          <span className="text-[10px] text-slate-600 hidden md:inline select-none border border-slate-800 px-1.5 py-0.5 rounded uppercase font-sans">Enter para ejecutar</span>
+          <span className="text-[10px] text-slate-600 hidden md:inline select-none border border-slate-800 px-1.5 py-0.5 rounded uppercase font-sans">
+            {inputEnabled ? 'Entrada interactiva' : 'Enter para ejecutar'}
+          </span>
           <button
             type="button"
             onClick={onCancelTask}

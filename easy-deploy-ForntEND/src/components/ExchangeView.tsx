@@ -1,13 +1,15 @@
 ﻿import React, { useState } from 'react';
 import { Mail, CheckCircle2, Loader2, Play, ArrowRight } from 'lucide-react';
 import { realActionId } from '../services/actionMap';
+import type { ActiveTab } from '../types';
 
 interface ExchangeViewProps {
   onAppendLogs: (logs: string[]) => void;
   onRunAction: (action: string, payload?: Record<string, unknown>) => Promise<unknown>;
+  onSetTab: (tab: ActiveTab) => void;
 }
 
-export default function ExchangeView({ onAppendLogs, onRunAction }: ExchangeViewProps) {
+export default function ExchangeView({ onAppendLogs, onRunAction, onSetTab }: ExchangeViewProps) {
   const [activeTask, setActiveTask] = useState<string | null>(null);
   const [stepsState, setStepsState] = useState<Record<string, 'pending' | 'completed'>>({
     exchange_prereqs: 'pending',
@@ -66,6 +68,10 @@ export default function ExchangeView({ onAppendLogs, onRunAction }: ExchangeView
   ];
 
   const handleExecuteTask = (taskId: string, title: string) => {
+    if (taskId === 'exchange_users') {
+      onSetTab('exchange_users_form');
+      return;
+    }
     setActiveTask(taskId);
     onAppendLogs([
       `[CLIENT] Iniciando tarea de Exchange: "${title}" ...`,

@@ -171,7 +171,7 @@ export default function DashboardView({ onAppendLog, onSetTab, onRunAction }: Da
           <div className="absolute top-0 left-0 bottom-0 w-1 bg-transparent group-hover:bg-indigo-500" style={{ backgroundColor: 'var(--theme-accent-primary)' }} />
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-extrabold pr-0.5" style={{ color: 'var(--theme-accent-primary)' }}>?</span>
+              <span className="text-sm font-extrabold pr-0.5" style={{ color: 'var(--theme-accent-primary)' }}></span>
             </div>
             <h4 
               className="text-sm font-bold font-sans group-hover:opacity-80 transition-colors" 

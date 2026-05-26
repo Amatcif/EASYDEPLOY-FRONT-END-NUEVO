@@ -68,6 +68,14 @@ export const backendClient = {
     return Promise.resolve(false);
   },
 
+  sendConsoleInput(value: string) {
+    const bridge = getBridge();
+    if (bridge?.sendConsoleInput) {
+      return bridge.sendConsoleInput(value);
+    }
+    return Promise.resolve(false);
+  },
+
   onBackendEvent(callback: (event: BackendEvent) => void) {
     const bridge = getBridge();
     if (bridge?.onBackendEvent) {

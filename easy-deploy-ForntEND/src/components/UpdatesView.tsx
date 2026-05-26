@@ -4,11 +4,11 @@ import { RefreshCw, Info, Save, Download, PackageCheck } from 'lucide-react';
 interface UpdatesViewProps {
   onAppendLog: (source: string, type: 'info' | 'success' | 'warning' | 'error', message: string) => void;
   onRunAction: (action: string, payload?: Record<string, unknown>) => Promise<unknown>;
-  updateData?: Record<string, unknown>;
-  downloadData?: Record<string, unknown>;
-  backendProgress?: number;
+  updateData: Record<string, unknown>;
+  downloadData: Record<string, unknown>;
+  backendProgress: number;
   appVersion: string;
-  onQuitApp?: () => Promise<unknown>;
+  onQuitApp: () => Promise<unknown>;
 }
 
 type DownloadState = 'idle' | 'downloading' | 'downloaded' | 'launching' | 'error';
@@ -24,7 +24,7 @@ export default function UpdatesView({
 }: UpdatesViewProps) {
   const [checking, setChecking] = useState(false);
   const [endpointRoute, setEndpointRoute] = useState(
-    'https://www.dropbox.com/scl/fi/p8qbe0fzn17nk7qdah75x/update.json?rlkey=7yb1odpc9aptdrek0mk7iafgk&st=3yg87fc3&dl=1'
+    'https://www.dropbox.com/scl/fi/p8qbe0fzn17nk7qdah75x/update.jsonrlkey=7yb1odpc9aptdrek0mk7iafgk&st=3yg87fc3&dl=1'
   );
   const [remoteVersion, setRemoteVersion] = useState('-');
   const [checkingStatus, setCheckingStatus] = useState('pendiente de comprobación.');
@@ -49,8 +49,8 @@ export default function UpdatesView({
     const available = updateData.available === true;
     const remote = String(updateData.remote_version || updateData.version || '-');
     const rawNotes = updateData.notes;
-    const formattedNotes = Array.isArray(rawNotes)
-      ? rawNotes.map(String).join(' | ')
+    const formattedNotes = Array.isArray(rawNotes) ?
+       rawNotes.map(String).join(' | ')
       : String(rawNotes || 'sin notas publicadas.');
 
     setRemoteVersion(remote);
@@ -60,8 +60,8 @@ export default function UpdatesView({
     setInstallerUrl(String(updateData.installer_url || updateData.url || ''));
     setInstallerFilename(String(updateData.filename || ''));
     setCheckingStatus(
-      available
-        ? `hay una actualización disponible: ${remote}.`
+      available ?
+         `hay una actualización disponible: ${remote}.`
         : 'Easy Deploy está actualizado.'
     );
     setChecking(false);

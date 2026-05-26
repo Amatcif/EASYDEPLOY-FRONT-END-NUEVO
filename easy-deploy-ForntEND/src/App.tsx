@@ -19,6 +19,7 @@ import ConsolePanel from './components/ConsolePanel';
 import VersionsView from './components/VersionsView';
 import ServiceActionView from './components/ServiceActionView';
 import CreditsView from './components/CreditsView';
+import UserCreationFormView from './components/UserCreationFormView';
 import { backendClient, getDetectedBridgeApis } from './services/backendClient';
 import type { BackendEvent } from './types/backend';
 import { Terminal, Shield, RefreshCw, Cpu, Activity, Layout, Palette, Check, ChevronDown, Clock } from 'lucide-react';
@@ -50,10 +51,11 @@ export default function App() {
   const [pendingPrompt, setPendingPrompt] = useState<BackendEvent | null>(null);
   const [promptValue, setPromptValue] = useState('');
   const promptInputRef = useRef<HTMLInputElement>(null);
+  const [consoleInput, setConsoleInput] = useState({ enabled: false, placeholder: '', sensitive: false });
   const [notification, setNotification] = useState<{ title: string; message: string; level: 'info' | 'success' | 'warning' | 'error' } | null>(null);
 
   const remainingDays = 7 - Math.min(registry.Dias_Transcurridos, 7);
-  const displayedVersion = String(appInfo.version || '2.2.5.27');
+  const displayedVersion = String(appInfo.version || '2.2.5.28');
 
   const setCurrentAction = (action: string | null) => {
     activeActionRef.current = action;
@@ -85,7 +87,7 @@ export default function App() {
   
   // Custom console logs
   const [logs, setLogs] = useState<string[]>([
-    'Easy Deploy Orchestrator [v2.2.5.27]',
+    'Easy Deploy Orchestrator [v2.2.5.28]',
     'Copyright (C) 2026 Easy Deploy. Todos los derechos reservados.',
     '',
     '[BOOT] [i] Cargando front-end React/Electron...',
@@ -138,7 +140,7 @@ ${missing.length ? missing.map((item) => `- ${item}`).join('\n') : '- No se pudo
   };
 
   const finishPrompt = (value: unknown) => {
-    if (!pendingPrompt?.prompt_id) return;
+    if (!pendingPrompt.prompt_id) return;
     backendClient.respondPrompt(String(pendingPrompt.prompt_id), value);
     setPendingPrompt(null);
     setPromptValue('');
@@ -157,13 +159,13 @@ ${missing.length ? missing.map((item) => `- ${item}`).join('\n') : '- No se pudo
         input.select();
         input.setSelectionRange(0, input.value.length);
       } catch (_) {
-        promptInputRef.current?.focus();
+        promptInputRef.current.focus();
       }
     };
 
     focusPrompt();
     const frame = window.requestAnimationFrame(focusPrompt);
-    const timers = [50, 120, 250, 500, 900, 1400].map((delay) => window.setTimeout(focusPrompt, delay));
+    const timers = [50, 150, 300].map((delay) => window.setTimeout(focusPrompt, delay));
     return () => {
       window.cancelAnimationFrame(frame);
       timers.forEach((timer) => window.clearTimeout(timer));
@@ -185,8 +187,8 @@ ${missing.length ? missing.map((item) => `- ${item}`).join('\n') : '- No se pudo
     backendClient.getAppInfo()
       .then((info) => {
         setAppInfo(info || {});
-        setLogs(prev => [...prev, `[BOOT] [i] Versión real cargada: ${String((info as any)?.version || 'desconocida')}`]);
-        if ((info as any)?.smokeActions) {
+        setLogs(prev => [...prev, `[BOOT] [i] Versión real cargada: ${String((info as any).version || 'desconocida')}`]);
+        if ((info as any).smokeActions) {
           setLogs(prev => [...prev, '[BOOT] [i] Smoke test de acciones seguras activado por entorno.']);
           backendClient.runAction('dashboard.check_admin');
           backendClient.runAction('dashboard.check_resources');
@@ -241,6 +243,15 @@ ${missing.length ? missing.map((item) => `- ${item}`).join('\n') : '- No se pudo
         setPendingPrompt(event);
         return;
       }
+      if (event.type === 'console_input') {
+        setActiveTab('deployment_console');
+        setConsoleInput({
+          enabled: Boolean(event.enabled),
+          placeholder: String(event.placeholder || ''),
+          sensitive: Boolean(event.sensitive),
+        });
+        return;
+      }
       if (event.type === 'data') {
         if (event.name) {
           setBackendData(prev => ({ ...prev, [String(event.name)]: event.value }));
@@ -279,8 +290,8 @@ ${missing.length ? missing.map((item) => `- ${item}`).join('\n') : '- No se pudo
           const admin = (event.result as Record<string, unknown>).admin === true;
           setNotification({
             title: admin ? 'Privilegios de administrador' : 'Sin privilegios de administrador',
-            message: admin
-              ? 'Easy Deploy se está ejecutando con privilegios de Administrador.'
+            message: admin ?
+               'Easy Deploy se está ejecutando con privilegios de Administrador.'
               : 'Easy Deploy NO se está ejecutando con privilegios de Administrador. Cierra la aplicación y usa “Ejecutar como administrador”.',
             level: admin ? 'success' : 'warning',
           });
@@ -362,7 +373,7 @@ ${missing.length ? missing.map((item) => `- ${item}`).join('\n') : '- No se pudo
 
 ${action}
 
-La salida se mostrará en la consola o se pedirán datos mediante una ventana. ¿Quieres continuar?`);
+La salida se mostrará en la consola o se pedirán datos mediante una ventana. ¿Quieres continuar`);
       if (!proceed) {
         setLogs(prev => [...prev, `[CLIENT] [AVISO] Acción cancelada por el usuario: ${action}`]);
         return { cancelled: true };
@@ -460,7 +471,7 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
       return;
     }
 
-    if (pendingPrompt?.prompt_id) {
+    if (pendingPrompt.prompt_id) {
       backendClient.respondPrompt(String(pendingPrompt.prompt_id), null);
       setPendingPrompt(null);
       setPromptValue('');
@@ -479,9 +490,16 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
     const sanitized = cmd.toLowerCase().trim();
     const timestamp = new Date().toTimeString().split(' ')[0];
     
+    if (consoleInput.enabled) {
+      const visible = consoleInput.sensitive ? '[oculto]' : cmd;
+      setLogs(prev => [...prev, `> ${visible}`]);
+      backendClient.sendConsoleInput(cmd);
+      return;
+    }
+
     setLogs(prev => [...prev, `> C:\\Deploy> ${cmd}`]);
 
-    if (sanitized === 'help' || sanitized === '?') {
+    if (sanitized === 'help' || sanitized === '') {
       setLogs(prev => [
         ...prev,
         'Comandos de Orquestación Disponibles:',
@@ -672,6 +690,16 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
               onAppendLogs={handleAppendMultipleLogs} 
               onClearConsole={handleClearConsole} 
               onRunAction={runBackendAction}
+              onSetTab={setActiveTab}
+            />
+          )}
+
+          {activeTab === 'ad_users_form' && (
+            <UserCreationFormView
+              mode="ad"
+              onBack={() => setActiveTab('ad')}
+              onRunAction={runBackendAction}
+              onAppendLog={handleAppendLog}
             />
           )}
 
@@ -690,6 +718,16 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
             <ExchangeView 
               onAppendLogs={handleAppendMultipleLogs} 
               onRunAction={runBackendAction}
+              onSetTab={setActiveTab}
+            />
+          )}
+
+          {activeTab === 'exchange_users_form' && (
+            <UserCreationFormView
+              mode="exchange"
+              onBack={() => setActiveTab('exchange')}
+              onRunAction={runBackendAction}
+              onAppendLog={handleAppendLog}
             />
           )}
 
@@ -805,6 +843,9 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
               activeAction={activeAction}
               onCancelTask={handleCancelCurrentTask}
               onOpenLogs={() => runBackendAction('dashboard.open_logs', { stayOnPage: true })}
+              consoleInputEnabled={consoleInput.enabled}
+              consoleInputPlaceholder={consoleInput.placeholder}
+              consoleInputSensitive={consoleInput.sensitive}
             />
           )}
 
@@ -835,7 +876,10 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
       </main>
 
       {pendingPrompt && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 px-4">
+        <div
+          className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 px-4"
+          onMouseDown={() => promptInputRef.current.focus({ preventScroll: true })}
+        >
           <div className="w-full max-w-lg rounded-2xl border p-5 shadow-2xl" style={{ backgroundColor: 'var(--theme-bg-card)', borderColor: 'var(--theme-border-card)', color: 'var(--theme-text-primary)' }}>
             <h3 className="text-base font-bold mb-2">{String(pendingPrompt.title || 'Easy Deploy')}</h3>
             <p className="text-sm whitespace-pre-wrap mb-4" style={{ color: 'var(--theme-text-secondary)' }}>{String(pendingPrompt.message || '')}</p>
@@ -848,7 +892,16 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
                 ))}
               </div>
             ) : (
-              <form onSubmit={(event) => { event.preventDefault(); finishPrompt(promptValue); }} className="space-y-4">
+              <form
+                onSubmit={(event) => { event.preventDefault(); finishPrompt(promptValue); }}
+                onKeyDown={(event) => {
+                  if (event.key === 'Escape') {
+                    event.preventDefault();
+                    finishPrompt(null);
+                  }
+                }}
+                className="space-y-4"
+              >
                 <input
                   ref={promptInputRef}
                   autoFocus

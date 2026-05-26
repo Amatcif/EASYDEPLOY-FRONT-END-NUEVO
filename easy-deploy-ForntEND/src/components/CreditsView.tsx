@@ -31,7 +31,7 @@ export default function CreditsView({ onSetTab }: CreditsViewProps) {
           </div>
           <div>
             <h1 className="text-lg font-bold font-sans tracking-tight mb-1 flex items-center gap-2" style={{ color: 'var(--theme-text-primary)' }}>
-              Acerca de Easy Deploy <span className="text-xs font-mono" style={{ color: 'var(--theme-accent-primary)' }}>v2.2.5.27</span>
+              Acerca de Easy Deploy <span className="text-xs font-mono" style={{ color: 'var(--theme-accent-primary)' }}>v2.2.5.28</span>
             </h1>
             <p className="text-xs font-sans" style={{ color: 'var(--theme-text-secondary)' }}>
               Créditos del proyecto y reparto interno de desarrollo declarado para el programa.
@@ -39,7 +39,7 @@ export default function CreditsView({ onSetTab }: CreditsViewProps) {
           </div>
         </div>
         <span className="text-[10px] font-mono font-bold shrink-0 self-end sm:self-center" style={{ color: 'var(--theme-text-secondary)', opacity: 0.8 }}>
-          v2.2.5.27
+          v2.2.5.28
         </span>
       </div>
 

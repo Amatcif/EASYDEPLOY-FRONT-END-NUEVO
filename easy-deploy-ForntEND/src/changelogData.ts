@@ -6,6 +6,19 @@ export interface ChangelogItem {
 
 export const changelogData: ChangelogItem[] = [
   {
+    version: '2.2.5.28',
+    date: '26/05/2026',
+    changes: [
+      'Corregido nombre de procesos principal y backend en Administrador de tareas.',
+      'Actualizador silencioso sin CMD visible y lanzamiento controlado tras aceptar.',
+      'Corregido foco de prompts/cajas de texto en KMS, DC, Exchange y cualquier entrada bridge.',
+      'Restaurados formularios grandes de creación de usuarios AD y Exchange.',
+      'Restaurada interacción de Switch Allied, Switch Cisco y Router desde la consola integrada.',
+      'Revisión completa de botones, actionMap y action registry.',
+      'Mejorado cierre limpio de backend al cerrar/desinstalar.'
+    ]
+  },
+  {
     version: '2.2.5.27',
     date: '26/05/2026',
     changes: [

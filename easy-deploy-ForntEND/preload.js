@@ -11,6 +11,9 @@ function createBackendApi() {
     respondPrompt(promptId, value) {
       return ipcRenderer.invoke('backend:respondPrompt', promptId, value);
     },
+    sendConsoleInput(value) {
+      return ipcRenderer.invoke('backend:sendConsoleInput', value);
+    },
     onBackendEvent(callback) {
       const listener = (_event, payload) => callback(payload);
       ipcRenderer.on('backend:event', listener);

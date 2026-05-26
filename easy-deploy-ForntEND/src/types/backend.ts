@@ -22,14 +22,15 @@ export interface BackendEvent {
 }
 
 export interface BackendApi {
-  runAction?: (action: string, payload?: Record<string, unknown>) => Promise<{ id?: string; accepted?: boolean; error?: string } | unknown>;
-  cancelAction?: () => Promise<{ id?: string; accepted?: boolean; error?: string } | unknown>;
-  respondPrompt?: (promptId: string, value: unknown) => Promise<boolean | unknown>;
-  onBackendEvent?: (callback: (event: BackendEvent) => void) => () => void;
-  getAppInfo?: () => Promise<Record<string, unknown> | unknown>;
-  getBackendStatus?: () => Promise<Record<string, unknown> | unknown>;
-  pingPreload?: () => Promise<Record<string, unknown> | unknown>;
-  quitApp?: () => Promise<Record<string, unknown> | unknown>;
+  runAction: (action: string, payload?: Record<string, unknown>) => Promise<{ id?: string; accepted?: boolean; error?: string } | unknown>;
+  cancelAction: () => Promise<{ id?: string; accepted?: boolean; error?: string } | unknown>;
+  respondPrompt: (promptId: string, value: unknown) => Promise<boolean | unknown>;
+  sendConsoleInput: (value: string) => Promise<boolean | unknown>;
+  onBackendEvent: (callback: (event: BackendEvent) => void) => () => void;
+  getAppInfo: () => Promise<Record<string, unknown> | unknown>;
+  getBackendStatus: () => Promise<Record<string, unknown> | unknown>;
+  pingPreload: () => Promise<Record<string, unknown> | unknown>;
+  quitApp: () => Promise<Record<string, unknown> | unknown>;
 }
 
 declare global {
@@ -41,4 +42,3 @@ declare global {
 }
 
 export {};
-

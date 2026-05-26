@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Activity, BookmarkPlus, Play, Square, Trash2, X } from 'lucide-react';
 
 interface PingFavorite {
-  name?: string;
+  name: string;
   host: string;
 }
 
@@ -20,16 +20,16 @@ interface PingCard {
 interface PingViewProps {
   onAppendLog: (source: string, type: 'info' | 'success' | 'warning' | 'error', message: string) => void;
   onRunAction: (action: string, payload?: Record<string, unknown>) => Promise<unknown>;
-  favoritesData?: unknown;
-  lastPingResult?: Record<string, unknown>;
+  favoritesData: unknown;
+  lastPingResult: Record<string, unknown>;
 }
 
 function asFavorites(value: unknown): PingFavorite[] {
   if (!Array.isArray(value)) return [];
   return value
     .map((item) => ({
-      name: String((item as Record<string, unknown>)?.name || ''),
-      host: String((item as Record<string, unknown>)?.host || ''),
+      name: String((item as Record<string, unknown>).name || ''),
+      host: String((item as Record<string, unknown>).host || ''),
     }))
     .filter((item) => item.host);
 }
@@ -69,8 +69,8 @@ export default function PingView({ onAppendLog, onRunAction, favoritesData, last
     const ok = lastPingResult.ok === true;
     const checked = new Date().toLocaleTimeString();
     setCards((prev) => prev.map((card) => (
-      card.host.toLowerCase() === target.toLowerCase()
-        ? { ...card, ok, lastOutput: output, lastChecked: checked }
+      card.host.toLowerCase() === target.toLowerCase() ?
+         { ...card, ok, lastOutput: output, lastChecked: checked }
         : card
     )));
   }, [lastPingResult]);
@@ -99,14 +99,14 @@ export default function PingView({ onAppendLog, onRunAction, favoritesData, last
     timers.current.set(card.id, timer);
   };
 
-  const addPing = (presetHost?: string, presetName?: string) => {
+  const addPing = (presetHost = '', presetName = '') => {
     const target = String(presetHost || host).trim();
     if (!target) {
       onAppendLog('PING', 'warning', 'Introduce una IP o nombre DNS antes de iniciar el ping.');
       return;
     }
     const exists = cards.some((card) => card.host.toLowerCase() === target.toLowerCase());
-    if (exists && !window.confirm(`Ya tienes un ping agregado para:\n\n${target}\n\n¿Quieres añadirlo igualmente?`)) {
+    if (exists && !window.confirm(`Ya tienes un ping agregado para:\n\n${target}\n\n¿Quieres añadirlo igualmente`)) {
       return;
     }
     const card: PingCard = {

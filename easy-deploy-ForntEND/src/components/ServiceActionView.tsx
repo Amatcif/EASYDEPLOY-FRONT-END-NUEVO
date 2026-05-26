@@ -5,7 +5,7 @@ export interface ServiceAction {
   id: string;
   title: string;
   desc: string;
-  badge?: string;
+  badge: string;
   action: string;
 }
 

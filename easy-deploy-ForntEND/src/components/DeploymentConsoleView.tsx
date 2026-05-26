@@ -7,10 +7,13 @@ interface DeploymentConsoleViewProps {
   onClearConsole: () => void;
   onExecuteCommand: (cmd: string) => void;
   onAppendLog: (source: string, type: 'info' | 'success' | 'warning' | 'error', message: string) => void;
-  backendProgress?: number;
-  activeAction?: string | null;
-  onOpenLogs?: () => void;
-  onCancelTask?: () => void;
+  backendProgress: number;
+  activeAction: string | null;
+  onOpenLogs: () => void;
+  onCancelTask: () => void;
+  consoleInputEnabled?: boolean;
+  consoleInputPlaceholder?: string;
+  consoleInputSensitive?: boolean;
 }
 
 export default function DeploymentConsoleView({
@@ -21,6 +24,9 @@ export default function DeploymentConsoleView({
   activeAction = null,
   onOpenLogs,
   onCancelTask,
+  consoleInputEnabled = false,
+  consoleInputPlaceholder = '',
+  consoleInputSensitive = false,
 }: DeploymentConsoleViewProps) {
   const progress = Math.max(0, Math.min(100, backendProgress));
 
@@ -104,6 +110,9 @@ export default function DeploymentConsoleView({
           className="w-full h-full min-h-[520px]"
           activeAction={activeAction}
           onCancelTask={onCancelTask}
+          inputEnabled={consoleInputEnabled}
+          inputPlaceholder={consoleInputPlaceholder}
+          inputSensitive={consoleInputSensitive}
         />
       </div>
     </div>
