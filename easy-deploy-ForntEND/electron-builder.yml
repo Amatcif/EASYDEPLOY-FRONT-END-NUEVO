@@ -1,7 +1,7 @@
 appId: com.easydeploy.desktop
 productName: EasyDeploy
 asar: true
-buildVersion: 2.2.5.23
+buildVersion: 2.2.5.27
 
 directories:
   output: dist_desktop
@@ -26,7 +26,7 @@ win:
       arch:
         - x64
   requestedExecutionLevel: requireAdministrator
-  artifactName: EasyDeploy_Setup_v2.2.5.23_${arch}.${ext}
+  artifactName: EasyDeploy_Setup_v2.2.5.27_${arch}.${ext}
 
 nsis:
   include: build/installer.nsh

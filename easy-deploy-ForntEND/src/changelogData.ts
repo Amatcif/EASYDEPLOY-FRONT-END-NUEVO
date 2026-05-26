@@ -6,6 +6,28 @@ export interface ChangelogItem {
 
 export const changelogData: ChangelogItem[] = [
   {
+    version: '2.2.5.27',
+    date: '26/05/2026',
+    changes: [
+      'Cierre completo del backend Python al cerrar Easy Deploy y al desinstalar desde Windows.',
+      'Cancelación protegida: las tareas de roles, características e instalaciones críticas avisan que no son cancelables.',
+      'Movido el botón Cancelar junto al botón RUN en la consola y aplicado estilo rojizo.',
+      'Reforzado el foco de prompts React para poder escribir directamente en KMS, IPs, dominios y números.',
+      'Actualizador reforzado para lanzar el instalador desde un helper desacoplado antes del cierre de la app.'
+    ]
+  },
+  {
+    version: '2.2.5.26',
+    date: '26/05/2026',
+    changes: [
+      'Añadido bloqueo global de ejecución para que no se inicie otra acción mientras una tarea sigue activa.',
+      'Añadido botón Cancelar en la consola para solicitar cancelación al backend Python.',
+      'Corregido el flujo del actualizador para lanzar el instalador antes de cerrar Easy Deploy y borrar el archivo descargado al terminar.',
+      'Aplicado cursor de mano a botones Ejecutar de KMS, SharePoint, SQL Server 2022 y JCHAT.',
+      'Reforzado el foco de campos de texto en prompts React.'
+    ]
+  },
+  {
     version: '2.2.5.25',
     date: '26/05/2026',
     changes: [

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { ActiveTab, SystemLog, WindowsRegistry } from './types';
 import Sidebar from './components/Sidebar';
 import DashboardView from './components/DashboardView';
@@ -45,13 +45,39 @@ export default function App() {
   const [appInfo, setAppInfo] = useState<Record<string, unknown>>({});
   const [backendProgress, setBackendProgress] = useState(0);
   const [backendData, setBackendData] = useState<Record<string, unknown>>({});
+  const [activeAction, setActiveAction] = useState<string | null>(null);
+  const activeActionRef = useRef<string | null>(null);
   const [pendingPrompt, setPendingPrompt] = useState<BackendEvent | null>(null);
   const [promptValue, setPromptValue] = useState('');
   const promptInputRef = useRef<HTMLInputElement>(null);
   const [notification, setNotification] = useState<{ title: string; message: string; level: 'info' | 'success' | 'warning' | 'error' } | null>(null);
 
   const remainingDays = 7 - Math.min(registry.Dias_Transcurridos, 7);
-  const displayedVersion = String(appInfo.version || '2.2.5.25');
+  const displayedVersion = String(appInfo.version || '2.2.5.27');
+
+  const setCurrentAction = (action: string | null) => {
+    activeActionRef.current = action;
+    setActiveAction(action);
+  };
+
+  const nonCancelableActions = new Set([
+    'ad.dc1',
+    'ad.dc2',
+    'ad.join_domain',
+    'ad.d2d4',
+    'exchange.prereqs',
+    'exchange.install',
+    'exchange.prepare_schema',
+    'exchange.recover_server',
+    'skype.prereqs',
+    'skype.install',
+    'sharepoint.install',
+    'sharepoint.roles',
+    'sql.install_2022',
+    'programs.netfx35',
+    'programs.install_all',
+  ]);
+
 
   useEffect(() => {
     localStorage.setItem('premium-theme', theme);
@@ -59,7 +85,7 @@ export default function App() {
   
   // Custom console logs
   const [logs, setLogs] = useState<string[]>([
-    'Easy Deploy Orchestrator [v2.2.5.25]',
+    'Easy Deploy Orchestrator [v2.2.5.27]',
     'Copyright (C) 2026 Easy Deploy. Todos los derechos reservados.',
     '',
     '[BOOT] [i] Cargando front-end React/Electron...',
@@ -119,13 +145,29 @@ ${missing.length ? missing.map((item) => `- ${item}`).join('\n') : '- No se pudo
   };
 
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!pendingPrompt || pendingPrompt.kind === 'confirm') return;
-    const timer = window.setTimeout(() => {
-      promptInputRef.current?.focus();
-      promptInputRef.current?.select();
-    }, 100);
-    return () => window.clearTimeout(timer);
+
+    const focusPrompt = () => {
+      try {
+        window.focus();
+        const input = promptInputRef.current;
+        if (!input) return;
+        input.focus({ preventScroll: true });
+        input.select();
+        input.setSelectionRange(0, input.value.length);
+      } catch (_) {
+        promptInputRef.current?.focus();
+      }
+    };
+
+    focusPrompt();
+    const frame = window.requestAnimationFrame(focusPrompt);
+    const timers = [50, 120, 250, 500, 900, 1400].map((delay) => window.setTimeout(focusPrompt, delay));
+    return () => {
+      window.cancelAnimationFrame(frame);
+      timers.forEach((timer) => window.clearTimeout(timer));
+    };
   }, [pendingPrompt]);
 
   useEffect(() => {
@@ -210,7 +252,15 @@ ${missing.length ? missing.map((item) => `- ${item}`).join('\n') : '- No se pudo
         return;
       }
       if (event.type === 'restart_required') {
-        setLogs(prev => [...prev, '[UPDATES] [AVISO] Se ha lanzado el instalador. Easy Deploy debe cerrarse para actualizar.']);
+        setLogs(prev => [...prev, '[UPDATES] [AVISO] Instalador lanzado. Easy Deploy se cerrará para actualizar.']);
+        setNotification({
+          title: 'Actualización iniciada',
+          message: 'El instalador de Easy Deploy se ha lanzado correctamente. La aplicación se cerrará en unos segundos para permitir la actualización.',
+          level: 'warning',
+        });
+        window.setTimeout(() => {
+          backendClient.quitApp();
+        }, 1200);
         return;
       }
       if (event.type === 'finished') {
@@ -236,11 +286,38 @@ ${missing.length ? missing.map((item) => `- ${item}`).join('\n') : '- No se pudo
           });
         }
         setLogs(prev => [...prev, `[${event.action || 'BACKEND'}] ${event.success ? '[OK]' : '[ERROR]'} Acción finalizada.`]);
+        const currentAction = activeActionRef.current;
+        const keepNetworkUntilInteractiveEnds = Boolean(currentAction && currentAction.startsWith('networks.') && event.action !== 'interactive_console');
+        if (currentAction && !keepNetworkUntilInteractiveEnds) {
+          setCurrentAction(null);
+        }
       }
     });
   }, []);
 
   const runBackendAction = async (action: string, payload: Record<string, unknown> = {}) => {
+    const bypassWhileRunning = new Set([
+      'app.info',
+      'dashboard.open_logs',
+      'tools.open_logs',
+      'updates.load_settings',
+      'updates.launch_installer',
+      'ping.favorites',
+      'ping.add_favorite',
+      'ping.delete_favorite',
+      'dashboard.ping',
+    ]);
+    if (activeActionRef.current && !bypassWhileRunning.has(action)) {
+      const current = activeActionRef.current;
+      const message = `Ya hay una tarea en ejecución: ${current}. Cancela la tarea desde la consola o espera a que termine antes de ejecutar otra función.`;
+      setNotification({ title: 'Tarea en ejecución', message, level: 'warning' });
+      setLogs(prev => [...prev, `[SYSTEM] [AVISO] ${message}`]);
+      if (activeTab !== 'deployment_console') {
+        setActiveTab('deployment_console');
+      }
+      return { accepted: false, busy: true, currentAction: current };
+    }
+
     const confirmRequired = new Set([
       'ad.dc1',
       'ad.dc2',
@@ -316,6 +393,16 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
       'ping.delete_favorite',
       'dashboard.ping',
     ]);
+    const nonBlockingActions = new Set([
+      'app.info',
+      'dashboard.open_logs',
+      'tools.open_logs',
+      'updates.load_settings',
+      'ping.favorites',
+      'ping.add_favorite',
+      'ping.delete_favorite',
+      'dashboard.ping',
+    ]);
     const shouldOpenConsole = !stayOnPage && !noConsoleActions.has(action) && !action.startsWith('updates.') && !action.startsWith('activation.');
     const header = [
       `Easy Deploy Orchestrator [v${displayedVersion}]`,
@@ -326,13 +413,25 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
     ];
 
     setBackendProgress(0);
+    if (!nonBlockingActions.has(action)) {
+      setCurrentAction(action);
+    }
     if (shouldOpenConsole) {
       setLogs(header);
       setActiveTab('deployment_console');
     } else {
       setLogs(prev => [...prev, `[CLIENT] Ejecutando acción real: ${action}`]);
     }
-    return backendClient.runAction(action, payload);
+    try {
+      const result = await backendClient.runAction(action, payload);
+      if (result && typeof result === 'object' && (result as any).accepted === false) {
+        if (activeActionRef.current === action) setCurrentAction(null);
+      }
+      return result;
+    } catch (error) {
+      if (activeActionRef.current === action) setCurrentAction(null);
+      throw error;
+    }
   };
 
   const handleAppendMultipleLogs = (lines: string[]) => {
@@ -341,6 +440,38 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
 
   const handleClearConsole = () => {
     setLogs([]);
+  };
+
+  const handleCancelCurrentTask = async () => {
+    const current = activeActionRef.current;
+    if (!current && !pendingPrompt) {
+      setNotification({
+        title: 'Sin tarea activa',
+        message: 'No hay ninguna acción en ejecución que cancelar.',
+        level: 'info',
+      });
+      return;
+    }
+
+    if (current && nonCancelableActions.has(current)) {
+      const message = `La tarea ${current} no se puede cancelar de forma segura porque instala roles, características o componentes críticos de Windows. Espera a que termine para no dejar el servidor en un estado intermedio.`;
+      setNotification({ title: 'Tarea no cancelable', message, level: 'warning' });
+      handleAppendLog('SYSTEM', 'warning', message);
+      return;
+    }
+
+    if (pendingPrompt?.prompt_id) {
+      backendClient.respondPrompt(String(pendingPrompt.prompt_id), null);
+      setPendingPrompt(null);
+      setPromptValue('');
+    }
+    handleAppendLog('SYSTEM', 'warning', `Cancelación solicitada${current ? ` para: ${current}` : ''}.`);
+    try {
+      await backendClient.cancelAction();
+    } finally {
+      setCurrentAction(null);
+      setBackendProgress(0);
+    }
   };
 
   // Custom CLI Parser
@@ -413,7 +544,7 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
 
   return (
     <div 
-      className={`flex h-screen w-screen font-sans overflow-hidden select-none antialiased theme-${theme}`}
+      className={`flex h-screen w-screen font-sans overflow-hidden antialiased theme-${theme}`}
       style={{
         backgroundColor: 'var(--theme-bg-app)',
         color: 'var(--theme-text-primary)'
@@ -671,6 +802,8 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
               onExecuteCommand={handleExecuteCommand} 
               onAppendLog={handleAppendLog}
               backendProgress={backendProgress}
+              activeAction={activeAction}
+              onCancelTask={handleCancelCurrentTask}
               onOpenLogs={() => runBackendAction('dashboard.open_logs', { stayOnPage: true })}
             />
           )}
@@ -720,10 +853,22 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
                   ref={promptInputRef}
                   autoFocus
                   type={pendingPrompt.is_password ? 'password' : 'text'}
+                  inputMode="text"
+                  autoComplete="off"
+                  spellCheck={false}
                   value={promptValue}
+                  onMouseDown={(event) => {
+                    event.stopPropagation();
+                    event.currentTarget.focus();
+                  }}
+                  onPointerDown={(event) => {
+                    event.stopPropagation();
+                    event.currentTarget.focus();
+                  }}
+                  onFocus={(event) => event.currentTarget.select()}
                   onChange={(event) => setPromptValue(event.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border bg-transparent text-sm"
-                  style={{ borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)' }}
+                  className="w-full px-3 py-2 rounded-lg border bg-transparent text-sm select-text focus:outline-none focus:ring-2"
+                  style={{ borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)', userSelect: 'text', WebkitUserSelect: 'text', caretColor: 'var(--theme-accent-primary)' }}
                 />
                 <div className="flex justify-end gap-2">
                   <button type="button" onClick={() => finishPrompt(null)} className="px-4 py-2 rounded-lg border text-sm font-bold" style={{ backgroundColor: 'var(--theme-bg-well)', borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)' }}>Cancelar</button>

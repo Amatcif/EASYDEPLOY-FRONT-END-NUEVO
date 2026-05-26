@@ -155,13 +155,8 @@ export default function UpdatesView({
   const launchDownloadedInstaller = (path = downloadedPath) => {
     if (!path) return;
     setDownloadState('launching');
-    setCheckingStatus('lanzando instalador. Easy Deploy se cerrará en unos segundos...');
+    setCheckingStatus('lanzando instalador. Easy Deploy se cerrará cuando el backend confirme el arranque...');
     onRunAction('updates.launch_installer', { path, stayOnPage: true })
-      .then(() => {
-        window.setTimeout(() => {
-          onQuitApp?.();
-        }, 1200);
-      })
       .catch((error) => {
         setDownloadState('error');
         setCheckingStatus('no se pudo lanzar el instalador.');

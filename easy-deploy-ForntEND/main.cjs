@@ -1,5 +1,5 @@
 const { app, BrowserWindow, Menu, ipcMain } = require('electron');
-const { spawn } = require('child_process');
+const { spawn, spawnSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
@@ -140,6 +140,37 @@ function backendExecutable() {
 
   // Último recurso en desarrollo: Python por módulo.
   return candidates[candidates.length - 1];
+}
+
+function stopBackend(reason = 'shutdown') {
+  const processToStop = backendProcess;
+  backendProcess = null;
+  if (!processToStop || processToStop.killed) return;
+  const pid = processToStop.pid;
+  writeMainLog('info', `Cerrando backend Python (${reason})`, { pid });
+  try {
+    if (processToStop.stdin && processToStop.stdin.writable) {
+      processToStop.stdin.write(JSON.stringify({ type: 'shutdown' }) + '\n', 'utf8');
+    }
+  } catch (error) {
+    writeMainLog('warning', 'No se pudo enviar shutdown al backend.', { error: String(error) });
+  }
+  try {
+    processToStop.kill();
+  } catch (error) {
+    writeMainLog('warning', 'No se pudo cerrar backend con kill().', { error: String(error) });
+  }
+  if (process.platform === 'win32' && pid) {
+    try {
+      spawnSync('taskkill.exe', ['/PID', String(pid), '/T', '/F'], {
+        windowsHide: true,
+        stdio: 'ignore',
+      });
+      writeMainLog('info', 'taskkill aplicado al árbol del backend.', { pid });
+    } catch (error) {
+      writeMainLog('warning', 'No se pudo aplicar taskkill al backend.', { pid, error: String(error) });
+    }
+  }
 }
 
 function sendToRenderer(event) {
@@ -352,6 +383,7 @@ function createWindow() {
   });
 
   mainWindow.on('closed', () => {
+    stopBackend('window-closed');
     mainWindow = null;
     rendererReady = false;
   });
@@ -521,14 +553,7 @@ if (!gotTheLock) {
   app.whenReady().then(createWindow);
 
   app.on('before-quit', () => {
-    try {
-      if (backendProcess && !backendProcess.killed) {
-        backendProcess.stdin.write(JSON.stringify({ type: 'shutdown' }) + '\n', 'utf8');
-        backendProcess.kill();
-      }
-    } catch (_) {
-      // Cierre defensivo: no bloquea la salida de Electron.
-    }
+    stopBackend('before-quit');
   });
 
   app.on('window-all-closed', () => {

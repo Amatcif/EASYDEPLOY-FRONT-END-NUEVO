@@ -8,7 +8,9 @@ interface DeploymentConsoleViewProps {
   onExecuteCommand: (cmd: string) => void;
   onAppendLog: (source: string, type: 'info' | 'success' | 'warning' | 'error', message: string) => void;
   backendProgress?: number;
+  activeAction?: string | null;
   onOpenLogs?: () => void;
+  onCancelTask?: () => void;
 }
 
 export default function DeploymentConsoleView({
@@ -16,7 +18,9 @@ export default function DeploymentConsoleView({
   onClearConsole,
   onExecuteCommand,
   backendProgress = 0,
+  activeAction = null,
   onOpenLogs,
+  onCancelTask,
 }: DeploymentConsoleViewProps) {
   const progress = Math.max(0, Math.min(100, backendProgress));
 
@@ -45,12 +49,15 @@ export default function DeploymentConsoleView({
           <button
             type="button"
             onClick={onOpenLogs}
-            className="px-3 py-2 rounded-lg border text-xs font-bold flex items-center gap-2"
+            className="px-3 py-2 rounded-lg border text-xs font-bold flex items-center gap-2 cursor-pointer"
             style={{ backgroundColor: 'var(--theme-bg-well)', borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)' }}
           >
             <FolderOpen size={14} style={{ color: 'var(--theme-accent-primary)' }} />
             Logs
           </button>
+          <span className="text-[10px] font-mono max-w-[260px] truncate" style={{ color: 'var(--theme-text-secondary)' }}>
+            {activeAction ? `Ejecutando: ${activeAction}` : 'Sin tarea activa'}
+          </span>
           <span className="text-2xl font-black font-mono" style={{ color: 'var(--theme-accent-primary)' }}>
             {progress}%
           </span>
@@ -95,6 +102,8 @@ export default function DeploymentConsoleView({
           onExecuteCommand={onExecuteCommand}
           title="Consola principal"
           className="w-full h-full min-h-[520px]"
+          activeAction={activeAction}
+          onCancelTask={onCancelTask}
         />
       </div>
     </div>

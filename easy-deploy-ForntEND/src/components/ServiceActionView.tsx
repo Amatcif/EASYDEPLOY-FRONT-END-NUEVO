@@ -52,7 +52,7 @@ export default function ServiceActionView({ eyebrow, title, subtitle, actions, o
           return (
             <div
               key={item.id}
-              className="p-5 rounded-xl border flex flex-col justify-between min-h-[160px]"
+              className="p-5 rounded-xl border flex flex-col justify-between min-h-[160px] transition-all hover:-translate-y-0.5"
               style={{ backgroundColor: active ? 'var(--theme-bg-well)' : 'var(--theme-bg-card)', borderColor: active ? 'var(--theme-accent-primary)' : 'var(--theme-border-card)' }}
             >
               <div>
@@ -66,7 +66,7 @@ export default function ServiceActionView({ eyebrow, title, subtitle, actions, o
                 <button
                   onClick={() => run(item)}
                   disabled={activeAction !== null}
-                  className="px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all disabled:opacity-50"
+                  className="px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                   style={{ backgroundColor: 'var(--theme-accent-primary)', color: '#fff' }}
                 >
                   <Play size={11} fill="currentColor" />

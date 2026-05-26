@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Terminal, Copy, Trash2, Play, CircleAlert, Sparkles, HelpCircle } from 'lucide-react';
+import { Terminal, Copy, Trash2, Play, Ban } from 'lucide-react';
 
 interface ConsolePanelProps {
   logs: string[];
@@ -7,6 +7,8 @@ interface ConsolePanelProps {
   onExecuteCommand?: (cmd: string) => void;
   title?: string;
   className?: string;
+  activeAction?: string | null;
+  onCancelTask?: () => void;
 }
 
 export default function ConsolePanel({ 
@@ -14,7 +16,9 @@ export default function ConsolePanel({
   onClear, 
   onExecuteCommand, 
   title = 'Consola de Despliegue de Sistemas',
-  className = "h-[320px]"
+  className = "h-[320px]",
+  activeAction = null,
+  onCancelTask,
 }: ConsolePanelProps) {
   const [inputVal, setInputVal] = useState('');
   const [history, setHistory] = useState<string[]>([]);
@@ -153,6 +157,16 @@ export default function ConsolePanel({
         />
         <div className="flex items-center gap-1.5 pr-2 shrink-0">
           <span className="text-[10px] text-slate-600 hidden md:inline select-none border border-slate-800 px-1.5 py-0.5 rounded uppercase font-sans">Enter para ejecutar</span>
+          <button
+            type="button"
+            onClick={onCancelTask}
+            disabled={!activeAction}
+            className="p-1 px-3 bg-rose-950/40 border border-rose-900/70 rounded text-rose-300 hover:text-rose-100 hover:border-rose-500 text-xs flex items-center gap-1 transition-all disabled:opacity-35 disabled:cursor-not-allowed"
+            title={activeAction ? `Cancelar tarea actual: ${activeAction}` : 'No hay una tarea activa que cancelar'}
+          >
+            <Ban size={11} />
+            <span className="font-mono text-[11px]">Cancelar</span>
+          </button>
           <button
             type="submit"
             className="p-1 px-3 bg-slate-900 border border-slate-800 rounded text-sky-400 hover:text-sky-300 hover:border-sky-800 text-xs flex items-center gap-1 transition-all"
