@@ -159,23 +159,29 @@ class HeadlessEasyDeployHost(
             message=f"Admin={'OK' if SysUtils.is_admin() else 'NO'} | Recursos={self.payload_root}",
         )
 
-    def _set_console_input_enabled(self, enabled, placeholder=None, cancel_enabled=None):
+    def _set_console_input_enabled(self, enabled, placeholder=None, cancel_enabled=None, sensitive=False):
         self.sink.emit(
             "console_input",
             enabled=bool(enabled),
             placeholder=placeholder or "",
             cancel_enabled=bool(cancel_enabled) if cancel_enabled is not None else False,
+            sensitive=bool(sensitive),
         )
 
     def _set_console_waiting_for_input(self, prompt_text="", sensitive=False):
-        value = self._request_prompt(
-            "Entrada de consola",
-            prompt_text or "Introduce el dato solicitado por la tarea:",
-            kind="input",
-            is_password=bool(sensitive),
-        )
-        if self.console_input_queue is not None:
-            self.console_input_queue.put(value)
+        placeholder = prompt_text or "Introduce el dato solicitado por la tarea y pulsa Enter."
+        self._set_console_input_enabled(True, placeholder, cancel_enabled=True, sensitive=bool(sensitive))
+
+    def submit_console_input(self, value):
+        if self.console_input_queue is None:
+            self.sink.emit(
+                "status",
+                level="warning",
+                message="No hay ninguna sesión interactiva esperando entrada.",
+            )
+            return False
+        self.console_input_queue.put(value)
+        return True
 
     def _finish_interactive_console_run(self):
         self._set_console_input_enabled(False, "Proceso finalizado.", cancel_enabled=False)

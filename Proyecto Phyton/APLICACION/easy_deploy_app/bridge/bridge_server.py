@@ -57,6 +57,9 @@ class BridgeServer:
         if msg_type == "prompt_response":
             self.host.respond_prompt(message.get("prompt_id"), message.get("value"))
             return
+        if msg_type == "console_input":
+            self.host.submit_console_input(message.get("value"))
+            return
         if msg_type == "cancel":
             self.host.cancelar_proceso()
             self.sink.emit("finished", id=request_id, action="cancel", success=True)

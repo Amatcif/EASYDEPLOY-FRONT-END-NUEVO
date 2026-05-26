@@ -689,24 +689,48 @@ class ActionRegistry:
             raise FileNotFoundError("No se encontró un instalador .exe válido.")
         if base not in installer.resolve().parents:
             raise ValueError("El instalador debe estar dentro de la carpeta controlada de actualizaciones.")
-        helper = base / f"easydeploy_update_{os.getpid()}.cmd"
+        helper = base / f"easydeploy_update_{os.getpid()}.ps1"
+        installer_literal = str(installer).replace("'", "''")
+        helper_literal = str(helper).replace("'", "''")
         helper.write_text(
-            "@echo off\r\n"
-            "setlocal\r\n"
-            "timeout /t 2 /nobreak >nul\r\n"
-            f'start "" /wait "{installer}"\r\n'
-            f'for /l %%i in (1,1,20) do (del /f /q "{installer}" >nul 2>nul & if not exist "{installer}" goto done & timeout /t 1 /nobreak >nul)\r\n'
-            ":done\r\n"
-            'del "%~f0" >nul 2>nul\r\n',
+            "$ErrorActionPreference = 'SilentlyContinue'\r\n"
+            f"$installer = '{installer_literal}'\r\n"
+            f"$self = '{helper_literal}'\r\n"
+            "Start-Sleep -Seconds 2\r\n"
+            "$proc = Start-Process -FilePath $installer -PassThru\r\n"
+            "if ($proc) { Wait-Process -Id $proc.Id }\r\n"
+            "for ($i = 0; $i -lt 25; $i++) {\r\n"
+            "  Remove-Item -LiteralPath $installer -Force -ErrorAction SilentlyContinue\r\n"
+            "  if (-not (Test-Path -LiteralPath $installer)) { break }\r\n"
+            "  Start-Sleep -Seconds 1\r\n"
+            "}\r\n"
+            "Remove-Item -LiteralPath $self -Force -ErrorAction SilentlyContinue\r\n",
             encoding="utf-8",
         )
         try:
-            os.startfile(str(helper))
-        except Exception:
             subprocess.Popen(
-                ["cmd.exe", "/c", "start", "", str(helper)],
-                creationflags=getattr(subprocess, "DETACHED_PROCESS", 0) | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0) | subprocess.CREATE_NO_WINDOW,
+                [
+                    "powershell.exe",
+                    "-NoProfile",
+                    "-ExecutionPolicy",
+                    "Bypass",
+                    "-WindowStyle",
+                    "Hidden",
+                    "-File",
+                    str(helper),
+                ],
+                creationflags=(
+                    getattr(subprocess, "DETACHED_PROCESS", 0)
+                    | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
+                    | getattr(subprocess, "CREATE_NO_WINDOW", 0)
+                ),
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
                 close_fds=True,
             )
+        except Exception:
+            helper.unlink(missing_ok=True)
+            raise
         self.host.sink.emit("restart_required", installer=str(installer))
         return {"launched": True, "installer": str(installer)}

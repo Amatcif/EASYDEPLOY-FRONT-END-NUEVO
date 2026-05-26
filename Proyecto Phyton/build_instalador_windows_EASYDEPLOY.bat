@@ -89,17 +89,17 @@ if errorlevel 1 (
 echo [3/7] Compilando backend Python JSONL con PyInstaller...
 if exist "%FRONTEND_DIR%\backend_dist" rmdir /s /q "%FRONTEND_DIR%\backend_dist"
 if exist "%FRONTEND_DIR%\backend_build" rmdir /s /q "%FRONTEND_DIR%\backend_build"
-py -3 -m PyInstaller --clean --noconfirm --onefile --console --name easydeploy_backend --distpath "%FRONTEND_DIR%\backend_dist" --workpath "%FRONTEND_DIR%\backend_build" --specpath "%FRONTEND_DIR%\backend_build" "%APP_DIR%\easy_deploy_backend_launcher.py"
+py -3 -m PyInstaller --clean --noconfirm --onefile --console --name "EasyDeploy back" --distpath "%FRONTEND_DIR%\backend_dist" --workpath "%FRONTEND_DIR%\backend_build" --specpath "%FRONTEND_DIR%\backend_build" "%APP_DIR%\easy_deploy_backend_launcher.py"
 if errorlevel 1 (
     popd
-    echo ERROR: Fallo PyInstaller compilando easydeploy_backend.exe.
+    echo ERROR: Fallo PyInstaller compilando EasyDeploy back.exe.
     if /i "%EASYDEPLOY_BUILD_PAUSE%"=="1" pause
     exit /b 1
 )
 popd
 
-if not exist "%FRONTEND_DIR%\backend_dist\easydeploy_backend.exe" (
-    echo ERROR: No se genero backend_dist\easydeploy_backend.exe.
+if not exist "%FRONTEND_DIR%\backend_dist\EasyDeploy back.exe" (
+    echo ERROR: No se genero backend_dist\EasyDeploy back.exe.
     if /i "%EASYDEPLOY_BUILD_PAUSE%"=="1" pause
     exit /b 1
 )
@@ -164,7 +164,7 @@ echo Clave de activacion guardada SOLO en:
 echo %USERPROFILE%\Desktop\EASYDEPLOY_CLAVE_ACTIVACION_v%APP_VERSION%.txt
 echo.
 echo Confirmacion de seguridad:
-echo - El instalador incluye backend_dist\easydeploy_backend.exe.
+echo - El instalador incluye backend_dist\EasyDeploy back.exe.
 echo - No copia node_modules como carpeta de trabajo del proyecto.
 echo - Electron-builder solo empaqueta las dependencias internas necesarias.
 echo - No incluye claves de activacion.
