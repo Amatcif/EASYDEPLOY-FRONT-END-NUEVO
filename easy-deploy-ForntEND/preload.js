@@ -43,7 +43,7 @@ function createBackendApi() {
 
 const api = createBackendApi();
 
-// Compatibilidad defensiva: algunas pantallas/servicios antiguos pueden buscar
+// Compatibilidad defensiva: algunas pantallas/servicios internos pueden buscar
 // nombres distintos. Los tres apuntan al mismo bridge seguro.
 contextBridge.exposeInMainWorld('easyDeployBackend', api);
 contextBridge.exposeInMainWorld('electronAPI', api);

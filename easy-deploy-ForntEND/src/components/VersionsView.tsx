@@ -16,7 +16,7 @@ export default function VersionsView({ onSetTab }: VersionsViewProps) {
           Historial de versiones
         </h1>
         <p className="text-xs font-sans text-slate-400" style={{ color: 'var(--theme-text-secondary)' }}>
-          Cambios publicados de Easy Deploy, ordenados de más reciente a más antiguo.
+          Cambios publicados de Easy Deploy, ordenados de más reciente a más interno.
         </p>
       </div>
 

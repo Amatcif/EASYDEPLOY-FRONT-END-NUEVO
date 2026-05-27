@@ -2,6 +2,7 @@ export type ActiveTab =
   | 'dashboard'
   | 'ad'
   | 'ad_users_form'
+  | 'd2d4_form'
   | 'kms'
   | 'exchange'
   | 'exchange_users_form'

@@ -76,12 +76,18 @@ export default function ConsolePanel({
   };
 
   return (
-    <div className={`bg-slate-950 rounded-xl border border-slate-800 shadow-2xl overflow-hidden flex flex-col font-mono text-sm leading-relaxed ${className}`}>
+    <div
+      className={`rounded-xl border shadow-2xl overflow-hidden flex flex-col font-mono text-sm leading-relaxed ${className}`}
+      style={{ backgroundColor: 'var(--theme-bg-card)', borderColor: 'var(--theme-border-card)', color: 'var(--theme-text-primary)' }}
+    >
       {/* Header bar */}
-      <div className="bg-slate-900 px-4 py-2.5 border-b border-slate-800 flex justify-between items-center shrink-0">
+      <div
+        className="px-4 py-2.5 border-b flex justify-between items-center shrink-0"
+        style={{ backgroundColor: 'var(--theme-bg-well)', borderColor: 'var(--theme-border-well)' }}
+      >
         <div className="flex items-center gap-2">
           <Terminal size={16} className="text-emerald-500 animate-pulse" />
-          <span className="font-semibold text-xs text-slate-200 tracking-wider uppercase">{title}</span>
+          <span className="font-semibold text-xs tracking-wider uppercase" style={{ color: 'var(--theme-text-primary)' }}>{title}</span>
           <span className="bg-emerald-950 border border-emerald-800 text-[10px] text-emerald-400 font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
             <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping" />
             LIVE
@@ -110,8 +116,11 @@ export default function ConsolePanel({
       </div>
 
       {/* Terminal Screen Container */}
-      <div className="p-4 overflow-y-auto flex-1 flex flex-col gap-1.5 min-h-0 bg-slate-950/95 scrollbar-thin scrollbar-thumb-slate-800">
-        <div className="text-slate-500 text-xs pb-1 border-b border-slate-900 border-dashed">
+      <div
+        className="p-4 overflow-y-auto flex-1 flex flex-col gap-1.5 min-h-0 scrollbar-thin scrollbar-thumb-slate-800"
+        style={{ backgroundColor: 'var(--theme-bg-card)' }}
+      >
+        <div className="text-xs pb-1 border-b border-dashed" style={{ color: 'var(--theme-text-secondary)', borderColor: 'var(--theme-border-well)' }}>
           --- CONSOLA DE DESPLIEGUE SEGURO REGISTRADA EN PUERTO 3000 ---
         </div>
         
@@ -123,21 +132,25 @@ export default function ConsolePanel({
           </div>
         ) : (
           logs.map((log, idx) => {
-            let colorClass = 'text-slate-300';
+            let color = 'var(--theme-text-primary)';
+            let fontWeight = 400;
             if (log.startsWith('[✓]') || log.includes('SUCCESS') || log.includes('éxito') || log.includes('OK') || log.includes('completó correctamente')) {
-              colorClass = 'text-emerald-400 font-medium';
+              color = '#10b981';
+              fontWeight = 600;
             } else if (log.startsWith('[!]') || log.startsWith('⚠️') || log.includes('ADVERTENCIA') || log.includes('WARNING')) {
-              colorClass = 'text-amber-400';
+              color = '#d97706';
             } else if (log.startsWith('[error]') || log.includes('ERROR') || log.includes('falló') || log.includes('failed')) {
-              colorClass = 'text-rose-400 font-medium';
+              color = '#ef4444';
+              fontWeight = 600;
             } else if (log.startsWith('⚡') || log.includes('C:\\>') || log.startsWith('PS C:\\')) {
-              colorClass = 'text-sky-400 font-semibold';
+              color = '#0284c7';
+              fontWeight = 600;
             } else if (log.startsWith('[i]') || log.startsWith('[+]') || log.startsWith('CN=') || log.startsWith('DC=')) {
-              colorClass = 'text-indigo-300';
+              color = 'var(--theme-accent-primary)';
             }
 
             return (
-              <div key={idx} className={`${colorClass} whitespace-pre-wrap select-all text-xs tracking-wide leading-relaxed`}>
+              <div key={idx} className="whitespace-pre-wrap select-all text-xs tracking-wide leading-relaxed" style={{ color, fontWeight }}>
                 {log}
               </div>
             );
@@ -147,7 +160,11 @@ export default function ConsolePanel({
       </div>
 
       {/* Active Input Line */}
-      <form onSubmit={handleSubmit} className="border-t border-slate-800 bg-slate-950 p-2 flex items-center gap-3 shrink-0">
+      <form
+        onSubmit={handleSubmit}
+        className="border-t p-2 flex items-center gap-3 shrink-0"
+        style={{ backgroundColor: 'var(--theme-bg-well)', borderColor: 'var(--theme-border-well)' }}
+      >
         <span className="text-sky-500 font-bold pl-2 flex items-center gap-1 shrink-0">
           <span>PS</span>
           <span className="text-slate-400 font-mono text-xs">C:\Deploy&gt;</span>
@@ -158,7 +175,8 @@ export default function ConsolePanel({
           onChange={(e) => setInputVal(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={inputEnabled ? inputPlaceholder : "Escribe 'help' para ver comandos, o ensaya comandos personalizados..."}
-          className="bg-transparent text-slate-100 flex-1 outline-none font-mono text-xs w-full py-1 caret-emerald-500 placeholder-slate-600 focus:placeholder-slate-500"
+          className="bg-transparent flex-1 outline-none font-mono text-xs w-full py-1 caret-emerald-500 placeholder-slate-600 focus:placeholder-slate-500"
+          style={{ color: 'var(--theme-text-primary)' }}
           id="terminal-input"
         />
         <div className="flex items-center gap-1.5 pr-2 shrink-0">

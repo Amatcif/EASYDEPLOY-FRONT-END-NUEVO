@@ -15,17 +15,20 @@ interface DashboardViewProps {
   onAppendLog: (source: string, type: 'info' | 'success' | 'warning' | 'error', message: string) => void;
   onSetTab: (tab: ActiveTab) => void;
   onRunAction: (action: string, payload?: Record<string, unknown>) => Promise<unknown>;
+  firewallState?: 'enabled' | 'disabled' | 'unknown';
 }
 
-export default function DashboardView({ onAppendLog, onSetTab, onRunAction }: DashboardViewProps) {
+export default function DashboardView({ onAppendLog, onSetTab, onRunAction, firewallState = 'unknown' }: DashboardViewProps) {
+  const firewallLabel = firewallState === 'enabled' ? 'Firewall OK' : firewallState === 'disabled' ? 'Firewall OFF' : 'Sin comprobar';
+  const firewallColor = firewallState === 'enabled' ? 'var(--theme-accent-primary)' : firewallState === 'disabled' ? '#ef4444' : 'var(--theme-text-secondary)';
   
   const handleDiskManagementClick = () => {
     onAppendLog('SYSTEM', 'info', 'Abriendo Disk Management.');
-    onRunAction('dashboard.disk_management');
+    onRunAction('dashboard.disk_management', { stayOnPage: true });
   };
 
   const handleEnvCheckClick = () => {
-    onAppendLog('SYSTEM', 'info', 'Usuario solicitó comprobación del entorno desde panel rápido.');
+    onAppendLog('SYSTEM', 'info', 'Usuario solicit? comprobación del entorno desde panel rápido.');
     onRunAction('dashboard.system_info');
   };
 
@@ -64,7 +67,7 @@ export default function DashboardView({ onAppendLog, onSetTab, onRunAction }: Da
         {/* Box 1: Privilegios */}
         <div 
           onClick={() => onRunAction('dashboard.check_admin')}
-          className="border rounded-xl p-4 flex flex-col justify-between hover:opacity-90 transition-all duration-150"
+          className="border rounded-xl p-4 flex flex-col justify-between hover:opacity-90 transition-all duration-150 cursor-pointer"
           style={{
             backgroundColor: 'var(--theme-bg-card)',
             borderColor: 'var(--theme-border-card)',
@@ -83,7 +86,7 @@ export default function DashboardView({ onAppendLog, onSetTab, onRunAction }: Da
         {/* Box 2: Recursos */}
         <div 
           onClick={() => onRunAction('dashboard.check_resources')}
-          className="border rounded-xl p-4 flex flex-col justify-between hover:opacity-90 transition-all duration-150"
+          className="border rounded-xl p-4 flex flex-col justify-between hover:opacity-90 transition-all duration-150 cursor-pointer"
           style={{
             backgroundColor: 'var(--theme-bg-card)',
             borderColor: 'var(--theme-border-card)',
@@ -102,7 +105,7 @@ export default function DashboardView({ onAppendLog, onSetTab, onRunAction }: Da
         {/* Box 3: Logs */}
         <div 
           onClick={() => onRunAction('dashboard.open_logs')}
-          className="border rounded-xl p-4 flex flex-col justify-between hover:opacity-90 transition-all duration-150"
+          className="border rounded-xl p-4 flex flex-col justify-between hover:opacity-90 transition-all duration-150 cursor-pointer"
           style={{
             backgroundColor: 'var(--theme-bg-card)',
             borderColor: 'var(--theme-border-card)',
@@ -121,7 +124,7 @@ export default function DashboardView({ onAppendLog, onSetTab, onRunAction }: Da
         {/* Box 4: Teclado ESP */}
         <div 
           onClick={() => onRunAction('dashboard.keyboard_es')}
-          className="border rounded-xl p-4 flex flex-col justify-between hover:opacity-90 transition-all duration-150"
+          className="border rounded-xl p-4 flex flex-col justify-between hover:opacity-90 transition-all duration-150 cursor-pointer"
           style={{
             backgroundColor: 'var(--theme-bg-card)',
             borderColor: 'var(--theme-border-card)',
@@ -150,9 +153,9 @@ export default function DashboardView({ onAppendLog, onSetTab, onRunAction }: Da
           <span className="text-[10px] font-bold uppercase tracking-wider font-sans group-hover:opacity-80 transition-colors" style={{ color: 'var(--theme-text-secondary)' }}>
             Firewall
           </span>
-          <span className="text-sm font-bold mt-2 font-mono flex items-center gap-1.5" style={{ color: 'var(--theme-accent-primary)' }}>
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--theme-accent-primary)' }} />
-            Firewall OK
+          <span className="text-sm font-bold mt-2 font-mono flex items-center gap-1.5" style={{ color: firewallColor }}>
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: firewallColor }} />
+            {firewallLabel}
           </span>
         </div>
       </div>
@@ -399,3 +402,4 @@ export default function DashboardView({ onAppendLog, onSetTab, onRunAction }: Da
     </div>
   );
 }
+

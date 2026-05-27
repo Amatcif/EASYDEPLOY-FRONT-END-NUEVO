@@ -1,8 +1,8 @@
 {
   "name": "easy-deploy",
   "private": true,
-  "version": "2.2.5-28",
-  "easyDeployVersion": "2.2.5.28",
+  "version": "2.2.5-31",
+  "easyDeployVersion": "2.2.5.31",
   "main": "main.cjs",
   "description": "EasyDeploy",
   "author": "Easy Deploy",

@@ -31,7 +31,7 @@ export default function CreditsView({ onSetTab }: CreditsViewProps) {
           </div>
           <div>
             <h1 className="text-lg font-bold font-sans tracking-tight mb-1 flex items-center gap-2" style={{ color: 'var(--theme-text-primary)' }}>
-              Acerca de Easy Deploy <span className="text-xs font-mono" style={{ color: 'var(--theme-accent-primary)' }}>v2.2.5.28</span>
+              Acerca de Easy Deploy <span className="text-xs font-mono" style={{ color: 'var(--theme-accent-primary)' }}>v2.2.5.31</span>
             </h1>
             <p className="text-xs font-sans" style={{ color: 'var(--theme-text-secondary)' }}>
               Créditos del proyecto y reparto interno de desarrollo declarado para el programa.
@@ -39,7 +39,7 @@ export default function CreditsView({ onSetTab }: CreditsViewProps) {
           </div>
         </div>
         <span className="text-[10px] font-mono font-bold shrink-0 self-end sm:self-center" style={{ color: 'var(--theme-text-secondary)', opacity: 0.8 }}>
-          v2.2.5.28
+          v2.2.5.31
         </span>
       </div>
 
@@ -100,7 +100,7 @@ export default function CreditsView({ onSetTab }: CreditsViewProps) {
           <ul className="space-y-2 text-[11px] font-sans" style={{ color: 'var(--theme-text-secondary)' }}>
             <li className="flex items-start gap-2">
               <span className="text-emerald-500 font-bold select-none">-</span>
-              <span>Sistemas, menús, Front End, Backend de UI y estética general.</span>
+              <span>Sistemas, menús, Front End, Backend de UI y estática general.</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-emerald-500 font-bold select-none">-</span>
@@ -172,3 +172,4 @@ export default function CreditsView({ onSetTab }: CreditsViewProps) {
     </div>
   );
 }
+

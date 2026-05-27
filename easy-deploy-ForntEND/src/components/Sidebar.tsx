@@ -38,7 +38,7 @@ type SidebarItem = {
   badge?: string;
 };
 
-export default function Sidebar({ activeTab, setActiveTab, systemName = "Easy Deploy", appVersion = "2.2.5.28" }: SidebarProps) {
+export default function Sidebar({ activeTab, setActiveTab, systemName = "Easy Deploy", appVersion = "2.2.5.31" }: SidebarProps) {
   const menuGroups: Array<{ title: string; items: SidebarItem[] }> = [
     {
       title: "Control General",
@@ -165,3 +165,4 @@ export default function Sidebar({ activeTab, setActiveTab, systemName = "Easy De
     </aside>
   );
 }
+

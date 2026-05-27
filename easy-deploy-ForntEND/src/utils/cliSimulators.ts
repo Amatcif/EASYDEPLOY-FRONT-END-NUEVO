@@ -222,7 +222,7 @@ export const terminalScripts: Record<string, string[]> = {
   ],
   maint_registry: [
     '⚡ C:\\> powershell.exe -File .\\Optimize-Registry.ps1',
-    'Analizando claves rotas de servicios huérfanos e instaladores antiguos...',
+    'Analizando claves rotas de servicios huérfanos e instaladores anteriors...',
     '',
     '[i] Analizando HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall...',
     '[+] Limpiando 42 punteros de instalación huérfanos.',

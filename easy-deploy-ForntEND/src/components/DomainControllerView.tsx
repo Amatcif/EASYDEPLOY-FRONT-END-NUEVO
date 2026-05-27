@@ -30,7 +30,7 @@ export default function DomainControllerView({ onAppendLogs, onClearConsole, onR
       id: 'ad_dc1',
       title: 'Promoción DC1 (Nuevo Bosque)',
       category: 'Configuración de Bosque',
-      desc: 'Levanta un nuevo bosque de Active Directory con DNS y validaciones del Easy Deploy clásico.',
+      desc: 'Levanta un nuevo bosque de Active Directory con DNS y validaciones internas.',
       accent: 'indigo'
     },
     {
@@ -44,14 +44,14 @@ export default function DomainControllerView({ onAppendLogs, onClearConsole, onR
       id: 'ad_join',
       title: 'Unir equipo a dominio',
       category: 'Dominio',
-      desc: 'Une el equipo al dominio usando las preguntas y validaciones del Easy Deploy clásico.',
+      desc: 'Une el equipo al dominio usando las preguntas y validaciones internas.',
       accent: 'indigo'
     },
     {
       id: 'ad_users',
       title: 'Creación de Usuarios AD',
       category: 'Aprovisionamiento',
-      desc: 'Abre los prompts del bridge para crear usuarios AD con datos introducidos por el técnico.',
+      desc: 'Abre el formulario completo de usuarios AD y envía los datos al motor interno.',
       accent: 'emerald'
     },
     {
@@ -65,7 +65,7 @@ export default function DomainControllerView({ onAppendLogs, onClearConsole, onR
       id: 'ad_d2_d4',
       title: 'D2/D4 Autoritative Restore',
       category: 'Recuperación',
-      desc: 'Asistente de recuperación SYSVOL/DFSR usando BurFlags D2/D4 según la acción indicada.',
+      desc: 'Abre el asistente D2/D4 para recuperación SYSVOL/DFSR con confirmación.',
       accent: 'rose'
     }
   ];
@@ -73,6 +73,10 @@ export default function DomainControllerView({ onAppendLogs, onClearConsole, onR
   const handleExecuteAction = (actionId: string, title: string) => {
     if (actionId === 'ad_users') {
       onSetTab('ad_users_form');
+      return;
+    }
+    if (actionId === 'ad_d2_d4') {
+      onSetTab('d2d4_form');
       return;
     }
     setActiveTask(actionId);

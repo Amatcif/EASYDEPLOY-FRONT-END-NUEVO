@@ -7,11 +7,12 @@ import {
 interface SecurityViewProps {
   onAppendLog: (source: string, type: 'info' | 'success' | 'warning' | 'error', message: string) => void;
   onRunAction: (action: string, payload?: Record<string, unknown>) => Promise<unknown>;
+  firewallState?: 'enabled' | 'disabled' | 'unknown';
 }
 
-export default function SecurityView({ onAppendLog, onRunAction }: SecurityViewProps) {
-  // Original Firewall States
-  const [firewallOn, setFirewallOn] = useState(true);
+export default function SecurityView({ onAppendLog, onRunAction, firewallState = 'unknown' }: SecurityViewProps) {
+  const firewallOn = firewallState === 'enabled';
+  const firewallUnknown = firewallState === 'unknown';
 
   const [firewallRules, setFirewallRules] = useState([
     { id: 'r1', name: 'Permitir Active Directory LDAP Sockets', port: '389, 636', protocol: 'TCP', direction: 'Inbound', action: 'Permitir', active: true },
@@ -102,15 +103,14 @@ export default function SecurityView({ onAppendLog, onRunAction }: SecurityViewP
             <div>
               <span className="text-[10px] font-bold block font-mono" style={{ color: 'var(--theme-text-secondary)' }}>ESTADO DEL FIREWALL</span>
               <span className="text-base font-bold" style={{ color: firewallOn ? '#10b981' : '#ef4444' }}>
-                {firewallOn ? 'Cortafuegos Activo' : 'CORTAFUEGOS APAGADO'}
+                {firewallUnknown ? 'Estado pendiente' : firewallOn ? 'Cortafuegos Activo' : 'CORTAFUEGOS APAGADO'}
               </span>
               <p className="text-[10px]" style={{ color: 'var(--theme-text-secondary)' }}>Reglas de Directiva Local</p>
             </div>
             <button
               onClick={() => {
-                setFirewallOn(!firewallOn);
                 onAppendLog('FIREWALL', firewallOn ? 'warning' : 'success', `Se ha modificado el estado general del Firewall a: [${!firewallOn ? 'ENCENDIDO' : 'APAGADO'}].`);
-                onRunAction(firewallOn ? 'security.firewall_disable' : 'security.firewall_enable');
+                onRunAction(firewallOn ? 'security.firewall_disable' : 'security.firewall_enable', { stayOnPage: true });
               }}
               className="w-11 h-6 rounded-full p-0.5 transition-colors cursor-pointer border"
               style={{

@@ -20,9 +20,12 @@ import VersionsView from './components/VersionsView';
 import ServiceActionView from './components/ServiceActionView';
 import CreditsView from './components/CreditsView';
 import UserCreationFormView from './components/UserCreationFormView';
+import { D2D4FormView } from './components/D2D4FormView';
 import { backendClient, getDetectedBridgeApis } from './services/backendClient';
 import type { BackendEvent } from './types/backend';
 import { Terminal, Shield, RefreshCw, Cpu, Activity, Layout, Palette, Check, ChevronDown, Clock } from 'lucide-react';
+
+const APP_VERSION = '2.2.5.31';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
@@ -46,16 +49,18 @@ export default function App() {
   const [appInfo, setAppInfo] = useState<Record<string, unknown>>({});
   const [backendProgress, setBackendProgress] = useState(0);
   const [backendData, setBackendData] = useState<Record<string, unknown>>({});
+  const [firewallState, setFirewallState] = useState<'enabled' | 'disabled' | 'unknown'>('unknown');
   const [activeAction, setActiveAction] = useState<string | null>(null);
   const activeActionRef = useRef<string | null>(null);
   const [pendingPrompt, setPendingPrompt] = useState<BackendEvent | null>(null);
   const [promptValue, setPromptValue] = useState('');
   const promptInputRef = useRef<HTMLInputElement>(null);
+  const promptShellRef = useRef<HTMLDivElement>(null);
   const [consoleInput, setConsoleInput] = useState({ enabled: false, placeholder: '', sensitive: false });
   const [notification, setNotification] = useState<{ title: string; message: string; level: 'info' | 'success' | 'warning' | 'error' } | null>(null);
 
   const remainingDays = 7 - Math.min(registry.Dias_Transcurridos, 7);
-  const displayedVersion = String(appInfo.version || '2.2.5.28');
+  const displayedVersion = String(appInfo.version || APP_VERSION);
 
   const setCurrentAction = (action: string | null) => {
     activeActionRef.current = action;
@@ -87,7 +92,7 @@ export default function App() {
   
   // Custom console logs
   const [logs, setLogs] = useState<string[]>([
-    'Easy Deploy Orchestrator [v2.2.5.28]',
+    `Easy Deploy Orchestrator [v${APP_VERSION}]`,
     'Copyright (C) 2026 Easy Deploy. Todos los derechos reservados.',
     '',
     '[BOOT] [i] Cargando front-end React/Electron...',
@@ -147,27 +152,33 @@ ${missing.length ? missing.map((item) => `- ${item}`).join('\n') : '- No se pudo
   };
 
 
+  const focusPromptInput = () => {
+    if (!pendingPrompt || pendingPrompt.kind === 'confirm') return;
+    const input = promptInputRef.current;
+    try {
+      window.focus();
+      promptShellRef.current?.focus({ preventScroll: true });
+      if (!input) return;
+      input.disabled = false;
+      input.readOnly = false;
+      input.focus({ preventScroll: true });
+      input.select();
+      input.setSelectionRange(0, input.value.length);
+    } catch (_) {
+      input?.focus();
+    }
+  };
+
   useLayoutEffect(() => {
     if (!pendingPrompt || pendingPrompt.kind === 'confirm') return;
 
-    const focusPrompt = () => {
-      try {
-        window.focus();
-        const input = promptInputRef.current;
-        if (!input) return;
-        input.focus({ preventScroll: true });
-        input.select();
-        input.setSelectionRange(0, input.value.length);
-      } catch (_) {
-        promptInputRef.current.focus();
-      }
-    };
-
-    focusPrompt();
-    const frame = window.requestAnimationFrame(focusPrompt);
-    const timers = [50, 150, 300].map((delay) => window.setTimeout(focusPrompt, delay));
+    focusPromptInput();
+    const frame = window.requestAnimationFrame(focusPromptInput);
+    const secondFrame = window.requestAnimationFrame(() => window.requestAnimationFrame(focusPromptInput));
+    const timers = [50, 150, 300, 600].map((delay) => window.setTimeout(focusPromptInput, delay));
     return () => {
       window.cancelAnimationFrame(frame);
+      window.cancelAnimationFrame(secondFrame);
       timers.forEach((timer) => window.clearTimeout(timer));
     };
   }, [pendingPrompt]);
@@ -220,6 +231,8 @@ ${missing.length ? missing.map((item) => `- ${item}`).join('\n') : '- No se pudo
       if (event.type === 'ready') {
         setLogs(prev => [...prev, '[BRIDGE] [OK] Backend Python conectado.']);
         backendClient.runAction('app.info');
+        backendClient.runAction('security.firewall_status');
+        backendClient.runAction('config.network_adapters');
         return;
       }
       if (event.type === 'log' || event.type === 'status' || event.type === 'error' || event.type === 'notification') {
@@ -239,8 +252,10 @@ ${missing.length ? missing.map((item) => `- ${item}`).join('\n') : '- No se pudo
       }
       if (event.type === 'prompt' && event.prompt_id) {
         setActiveTab('deployment_console');
-        setPromptValue(String(event.default || ''));
-        setPendingPrompt(event);
+        window.setTimeout(() => {
+          setPromptValue(String(event.default || ''));
+          setPendingPrompt(event);
+        }, 0);
         return;
       }
       if (event.type === 'console_input') {
@@ -258,6 +273,9 @@ ${missing.length ? missing.map((item) => `- ${item}`).join('\n') : '- No se pudo
         }
         if (event.name === 'app.info' && event.value && typeof event.value === 'object') {
           setAppInfo(event.value as Record<string, unknown>);
+        }
+        if ((event.name === 'security.firewall_status' || event.name === 'dashboard.firewall_status') && event.value && typeof event.value === 'object') {
+          setFirewallState((event.value as Record<string, unknown>).enabled === true ? 'enabled' : 'disabled');
         }
         setLogs(prev => [...prev, `[DATA] ${event.name || 'backend'} actualizado.`]);
         return;
@@ -296,6 +314,12 @@ ${missing.length ? missing.map((item) => `- ${item}`).join('\n') : '- No se pudo
             level: admin ? 'success' : 'warning',
           });
         }
+        if ((event.action === 'security.firewall_status' || event.action === 'dashboard.firewall_status') && event.result && typeof event.result === 'object') {
+          setFirewallState((event.result as Record<string, unknown>).enabled === true ? 'enabled' : 'disabled');
+        }
+        if (event.action === 'security.firewall_disable' || event.action === 'security.firewall_enable') {
+          window.setTimeout(() => runBackendAction('security.firewall_status', { stayOnPage: true }), 300);
+        }
         setLogs(prev => [...prev, `[${event.action || 'BACKEND'}] ${event.success ? '[OK]' : '[ERROR]'} Acción finalizada.`]);
         const currentAction = activeActionRef.current;
         const keepNetworkUntilInteractiveEnds = Boolean(currentAction && currentAction.startsWith('networks.') && event.action !== 'interactive_console');
@@ -310,9 +334,12 @@ ${missing.length ? missing.map((item) => `- ${item}`).join('\n') : '- No se pudo
     const bypassWhileRunning = new Set([
       'app.info',
       'dashboard.open_logs',
+      'dashboard.disk_management',
       'tools.open_logs',
       'updates.load_settings',
       'updates.launch_installer',
+      'security.firewall_status',
+      'config.network_adapters',
       'ping.favorites',
       'ping.add_favorite',
       'ping.delete_favorite',
@@ -386,6 +413,7 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
       'dashboard.check_admin',
       'dashboard.check_resources',
       'dashboard.open_logs',
+      'dashboard.disk_management',
       'dashboard.keyboard_es',
       'tools.open_logs',
       'tools.open_resources',
@@ -399,6 +427,8 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
       'activation.status',
       'activation.activate',
       'activation.trial_status',
+      'security.firewall_status',
+      'config.network_adapters',
       'ping.favorites',
       'ping.add_favorite',
       'ping.delete_favorite',
@@ -407,8 +437,11 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
     const nonBlockingActions = new Set([
       'app.info',
       'dashboard.open_logs',
+      'dashboard.disk_management',
       'tools.open_logs',
       'updates.load_settings',
+      'security.firewall_status',
+      'config.network_adapters',
       'ping.favorites',
       'ping.add_favorite',
       'ping.delete_favorite',
@@ -682,6 +715,7 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
               onAppendLog={handleAppendLog} 
               onSetTab={setActiveTab} 
               onRunAction={runBackendAction}
+              firewallState={firewallState}
             />
           )}
 
@@ -703,11 +737,18 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
             />
           )}
 
+          {activeTab === 'd2d4_form' && (
+            <D2D4FormView
+              onBack={() => setActiveTab('ad')}
+              onRunAction={runBackendAction}
+            />
+          )}
+
           {activeTab === 'kms' && (
             <ServiceActionView
               eyebrow="Activación Windows"
               title="KMS"
-              subtitle="Conversión Evaluation y activación KMS reutilizando el motor clásico de Easy Deploy."
+              subtitle="Conversión Evaluation y activación KMS reutilizando el motor interno."
               actions={[{ id: 'kms_run', title: 'KMS', desc: 'Configura el servidor KMS, valida claves y lanza la activación con prompts seguros.', badge: 'KMS', action: 'kms.run' }]}
               onAppendLog={handleAppendLog}
               onRunAction={runBackendAction}
@@ -736,7 +777,7 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
               eyebrow="Servidor Microsoft"
               title="SharePoint"
               subtitle="Instalación de prerrequisitos y SharePoint desde recursos offline."
-              actions={[{ id: 'sharepoint_install', title: 'SharePoint', desc: 'Ejecuta la instalación de SharePoint con las validaciones del Easy Deploy clásico.', badge: 'SHAREPOINT', action: 'sharepoint.install' }]}
+              actions={[{ id: 'sharepoint_install', title: 'SharePoint', desc: 'Ejecuta la instalación de SharePoint con las validaciones internas.', badge: 'SHAREPOINT', action: 'sharepoint.install' }]}
               onAppendLog={handleAppendLog}
               onRunAction={runBackendAction}
             />
@@ -766,7 +807,7 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
               title="JCHAT"
               subtitle="Instalación de Openfire/JCHAT CLI reutilizando recursos offline."
               actions={[
-                { id: 'jchat_openfire', title: 'Jchat/Openfire', desc: 'Instala Java y Openfire como en Easy Deploy clásico.', badge: 'OPENFIRE', action: 'jchat.openfire' },
+                { id: 'jchat_openfire', title: 'Jchat/Openfire', desc: 'Instala Java y Openfire mediante el motor interno.', badge: 'OPENFIRE', action: 'jchat.openfire' },
                 { id: 'jchat_cli', title: 'Jchat CLI', desc: 'Instala el cliente JCHAT CLI desde el MSI offline.', badge: 'CLI', action: 'jchat.cli' },
               ]}
               onAppendLog={handleAppendLog}
@@ -787,6 +828,7 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
                 onAppendLog={handleAppendLog} 
                 onRunAction={runBackendAction}
                 updateData={backendData['updates.check'] as Record<string, unknown> | undefined}
+                settingsData={backendData['updates.settings'] as Record<string, unknown> | undefined}
                 downloadData={(backendData['updates.downloaded'] || backendData['updates.download']) as Record<string, unknown> | undefined}
                 backendProgress={backendProgress}
                 appVersion={displayedVersion}
@@ -807,6 +849,7 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
             <SecurityView 
               onAppendLog={handleAppendLog} 
               onRunAction={runBackendAction}
+              firewallState={firewallState}
             />
           )}
 
@@ -830,6 +873,8 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
           {activeTab === 'configuration' && (
             <ConfigView 
               onAppendLog={handleAppendLog} 
+              onRunAction={runBackendAction}
+              adaptersData={backendData['config.network_adapters'] as Record<string, unknown> | undefined}
             />
           )}
 
@@ -877,8 +922,11 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
 
       {pendingPrompt && (
         <div
+          ref={promptShellRef}
+          tabIndex={-1}
           className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 px-4"
-          onMouseDown={() => promptInputRef.current.focus({ preventScroll: true })}
+          onMouseDown={() => focusPromptInput()}
+          onPointerDown={() => focusPromptInput()}
         >
           <div className="w-full max-w-lg rounded-2xl border p-5 shadow-2xl" style={{ backgroundColor: 'var(--theme-bg-card)', borderColor: 'var(--theme-border-card)', color: 'var(--theme-text-primary)' }}>
             <h3 className="text-base font-bold mb-2">{String(pendingPrompt.title || 'Easy Deploy')}</h3>
@@ -905,6 +953,8 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
                 <input
                   ref={promptInputRef}
                   autoFocus
+                  disabled={false}
+                  readOnly={false}
                   type={pendingPrompt.is_password ? 'password' : 'text'}
                   inputMode="text"
                   autoComplete="off"
@@ -915,6 +965,10 @@ La salida se mostrará en la consola o se pedirán datos mediante una ventana. �
                     event.currentTarget.focus();
                   }}
                   onPointerDown={(event) => {
+                    event.stopPropagation();
+                    event.currentTarget.focus();
+                  }}
+                  onClick={(event) => {
                     event.stopPropagation();
                     event.currentTarget.focus();
                   }}

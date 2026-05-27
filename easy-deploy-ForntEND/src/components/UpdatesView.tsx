@@ -5,6 +5,7 @@ interface UpdatesViewProps {
   onAppendLog: (source: string, type: 'info' | 'success' | 'warning' | 'error', message: string) => void;
   onRunAction: (action: string, payload?: Record<string, unknown>) => Promise<unknown>;
   updateData: Record<string, unknown>;
+  settingsData?: Record<string, unknown>;
   downloadData: Record<string, unknown>;
   backendProgress: number;
   appVersion: string;
@@ -17,6 +18,7 @@ export default function UpdatesView({
   onAppendLog,
   onRunAction,
   updateData,
+  settingsData,
   downloadData,
   backendProgress = 0,
   appVersion,
@@ -24,7 +26,7 @@ export default function UpdatesView({
 }: UpdatesViewProps) {
   const [checking, setChecking] = useState(false);
   const [endpointRoute, setEndpointRoute] = useState(
-    'https://www.dropbox.com/scl/fi/p8qbe0fzn17nk7qdah75x/update.jsonrlkey=7yb1odpc9aptdrek0mk7iafgk&st=3yg87fc3&dl=1'
+    'https://www.dropbox.com/scl/fi/p8qbe0fzn17nk7qdah75x/update.json?rlkey=7yb1odpc9aptdrek0mk7iafgk&st=na1ikvk4&dl=1'
   );
   const [remoteVersion, setRemoteVersion] = useState('-');
   const [checkingStatus, setCheckingStatus] = useState('pendiente de comprobación.');
@@ -44,6 +46,17 @@ export default function UpdatesView({
   }, [backendProgress, downloadProgress, downloadState]);
 
   useEffect(() => {
+    onRunAction('updates.load_settings', { stayOnPage: true }).catch((error) => {
+      onAppendLog('UPDATES', 'warning', `No se pudo cargar la ruta guardada del actualizador: ${String(error)}`);
+    });
+  }, []);
+
+  useEffect(() => {
+    const savedUrl = String(settingsData?.url || '');
+    if (savedUrl) setEndpointRoute(savedUrl);
+  }, [settingsData]);
+
+  useEffect(() => {
     if (!updateData) return;
 
     const available = updateData.available === true;
@@ -57,7 +70,7 @@ export default function UpdatesView({
     setUpdateAvailable(available);
     setNotes(formattedNotes);
     setSha256(String(updateData.sha256 || ''));
-    setInstallerUrl(String(updateData.installer_url || updateData.url || ''));
+    setInstallerUrl(String(updateData.installer_url || updateData.url || updateData.downloadUrl || updateData.downloadURL || ''));
     setInstallerFilename(String(updateData.filename || ''));
     setCheckingStatus(
       available ?
@@ -109,8 +122,8 @@ export default function UpdatesView({
       .catch((error) => {
         setCheckingStatus('error al consultar actualizaciones.');
         onAppendLog('UPDATES', 'error', String(error));
-      })
-      .finally(() => setChecking(false));
+        setChecking(false);
+      });
   };
 
   const handleSaveRoute = () => {
@@ -234,7 +247,7 @@ export default function UpdatesView({
 
         <div className="space-y-2">
           <label className="text-[9px] font-black tracking-widest uppercase font-mono block" style={{ color: 'var(--theme-text-primary)' }}>
-            RUTA DEL ENDPOINT UPDATE.JSON
+            RUTA DEL ENDPOINT
           </label>
           <div className="flex gap-2.5">
             <input

@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Mail, CheckCircle2, Loader2, Play, ArrowRight } from 'lucide-react';
 import { realActionId } from '../services/actionMap';
 import type { ActiveTab } from '../types';

@@ -6,6 +6,22 @@ export interface ChangelogItem {
 
 export const changelogData: ChangelogItem[] = [
   {
+    version: '2.2.5.31',
+    date: '27/05/2026',
+    changes: [
+      'Reparado flujo de actualización y lanzamiento silencioso del instalador.',
+      'Corregido foco global de prompts y textboxes.',
+      'Restaurados formularios completos AD/Exchange y D2/D4.',
+      'Restauradas herramientas interactivas Allied/Cisco/Router mediante backend Python.',
+      'Corregidos favoritos y estados visuales del monitor Ping.',
+      'Sincronizado estado visual de Firewall.',
+      'Adaptadores de red ahora muestran datos reales.',
+      'Corregido tema blanco en consola.',
+      'Eliminadas referencias de compatibilidad no orientadas al usuario.',
+      'Revisados actionMap, registry y botones completos.'
+    ]
+  },
+  {
     version: '2.2.5.28',
     date: '26/05/2026',
     changes: [
@@ -46,7 +62,7 @@ export const changelogData: ChangelogItem[] = [
     changes: [
       'Pulida pestaña Actualizaciones: ocultadas URL/SHA/instalador, añadida barra de descarga y flujo descargar-instalar-cerrar.',
       'Corregidos avisos de Privilegios y confirmación al cambiar el endpoint update.json.',
-      'Mejorado el foco de prompts React para KMS, AD, Exchange, dominio y entradas antiguas.',
+      'Mejorado el foco de prompts React para KMS, AD, Exchange, dominio y entradas internas.',
       'La consola limpia la salida al iniciar una tarea nueva y añade acceso directo a Logs.',
       'Mejorado Monitor de ping con estados verde/rojo/gris y botón X para cerrar cada ping.',
       'Reforzada apertura de Logs y herramientas interactivas de red desde el backend real.'
@@ -60,7 +76,7 @@ export const changelogData: ChangelogItem[] = [
       'Movido Net Framework 3.5 a Instaladores Offline e incluido en Instalar todo el arsenal.',
       'Movido Forzar políticas GPO a Herramientas > Sistema.',
       'Eliminados paneles técnicos visibles de bridge/preload/teclado y bloques decorativos de Active Directory.',
-      'Añadidos prompts React para datos de Ping, usuarios AD/Exchange, dominio y acciones antiguas que pedían entradas.',
+      'Añadidos prompts React para datos de Ping, usuarios AD/Exchange, dominio y acciones internas que pedían entradas.',
       'Recursos, Logs y Actualizaciones muestran resultado sin redirigir innecesariamente a consola.'
     ]
   },
@@ -68,18 +84,18 @@ export const changelogData: ChangelogItem[] = [
     version: '2.2.5.23',
     date: '26/05/2026',
     changes: [
-      'Corregido mapeo de botones del nuevo front-end contra Easy Deploy clásico.',
+      'Corregido mapeo de botones del nuevo front-end contra Easy Deploy interno.',
       'Restaurado comportamiento de redirección automática a consola para acciones reales.',
       'Restauradas funciones reales de Recursos, Top procesos, Roles instalados, Comprobar entorno y Ping.',
       'Mejorada pestaña Actualizaciones para mostrar resultado en la propia pantalla.',
-      'Limpieza de textos, tildes, ñ, etiquetas antiguas y elementos visuales no funcionales.'
+      'Limpieza de textos, tildes, ?, etiquetas obsoletas y elementos visuales no funcionales.'
     ]
   },
   {
     version: '2.2.5.22',
     date: '26/05/2026',
     changes: [
-      'Desactivada la aceleración gráfica de Electron para mejorar el arranque en Windows Server 2019.',
+      'Desactivada la aceleraci?n gráfica de Electron para mejorar el arranque en Windows Server 2019.',
       'Añadido diagnóstico de compatibilidad GPU al log de arranque sin cambiar el bridge ni las tareas reales.'
     ]
   },
@@ -90,7 +106,7 @@ export const changelogData: ChangelogItem[] = [
       'Corregida la carga de preload en Electron con diagnóstico visible y pingPreload desde el renderer.',
       'Reforzado el bridge Electron/Python con logs diferenciados de cliente, Electron, backend y registro de acciones.',
       'Añadido self-test seguro del backend Python y dry-run para validar acciones peligrosas sin ejecutarlas.',
-      'Limpieza de builds Electron para evitar instalar artefactos antiguos.'
+      'Limpieza de builds Electron para evitar instalar artefactos obsoletos.'
     ]
   },
   {
@@ -108,9 +124,9 @@ export const changelogData: ChangelogItem[] = [
     date: '19/05/2026',
     changes: [
       'Migrado front-end principal a React/Electron manteniendo backend Python de Easy Deploy.',
-      'Conectadas acciones principales del nuevo front-end con funciones reales del motor antiguo.',
+      'Conectadas acciones principales del nuevo front-end con funciones reales del motor interno.',
       'Añadido bridge seguro Electron/Python con logs, progreso y prompts.',
-      'Adaptado build/instalador con clave de activación única por compilación.',
+      'Adaptado build/instalador con clave de activación única por compilaci?n.',
       'Añadida y probada función actualizar APP mediante internet.'
     ]
   },
@@ -163,7 +179,7 @@ export const changelogData: ChangelogItem[] = [
       'Corregido el estado visual de Recursos para actualizarse al momento si faltan archivos tras abrir la aplicación.',
       'Alineado el comprobador de recursos con Skype Server, prerrequisitos offline y nuevas guías Skype/D2-D4.',
       'Corregido falso positivo visual en consola para que la característica Web-Http-Errors de IIS no aparezca marcada como error durante los prerrequisitos de Skype.',
-      'Corregido arranque de tareas desde consola añadiendo la importación re que necesitaba layout.py para el filtrado visual de líneas como Web-Http-Errors.'
+      'Corregido arranque de tareas desde consola añadiendo la importaci?n re que necesitaba layout.py para el filtrado visual de líneas como Web-Http-Errors.'
     ]
   },
   {
@@ -178,15 +194,15 @@ export const changelogData: ChangelogItem[] = [
       'Corregido Permisos a usuario Skype para tratar correctamente objetos AD devueltos por PowerShell y evitar el error System.Object[].',
       'Rehecha la función Permisos a usuario de Skype reutilizando la lógica robusta de Crear usuarios AD: comprobación previa informativa y ejecución real mediante script PowerShell temporal.',
       'Corregido Permisos a usuario de Skype con comprobación previa de entorno AD/RSAT, botón recolocado abajo y salida PowerShell con tildes reparada.',
-      'Añadido botón Permisos a usuario en Skype para comprobar y asignar grupos AD/RBAC necesarios para instalación y administración.',
+      'Añadido botón Permisos a usuario en Skype para comprobar y asignar grupos AD/RBAC necesarios para instalación y administraci?n.',
       'Corregida la comprobación de entorno AD del botón Permisos a usuario Skype para evitar falsos negativos en controladores de dominio y mejorar la lectura de tildes en consola.',
-      'Añadido botón Créditos junto a Versiones con reparto de autoría y aviso legal de derechos reservados.',
+      'Añadido botón Créditos junto a Versiones con reparto de autor?a y aviso legal de derechos reservados.',
       'Mejorados los prerrequisitos de Skype para instalación offline usando Sources\\SxS y aviso de que Windows Features puede tardar varios minutos.',
       'La consola de Skype mueve la barra de progreso por fases durante prerrequisitos largos y muestra Reiniciar sistema cuando Windows deja reinicio pendiente.',
       'Corregidos falsos positivos de consola para que nombres técnicos como Web-Http-Errors no aparezcan como error rojo.',
       'Integrado Skype for Business Server con submenú propio: prerrequisitos e instalación desde ISO.',
       'Actualizado el comprobador de recursos para validar ISO y prerrequisitos de Skype, además de las nuevas guías.',
-      'Añadidas Guía Skype y Guía D2 D4 al apartado Guías, abriéndose como el resto de PDFs.',
+      'Añadidas Guía Skype y Guía D2 D4 al apartado Guías, abri?ndose como el resto de PDFs.',
       'Añadidos botones Repadmin y D2 D4 en Controlador de dominio.',
       'Mejorado el asistente D2/D4 DFSR SYSVOL con una interfaz más guiada y minimalista.',
       'Ajustado el logo lateral para quedar más grande y centrado.',
@@ -202,10 +218,10 @@ export const changelogData: ChangelogItem[] = [
     version: '2.2.1',
     date: '15/05/2026',
     changes: [
-      'Corregida la función para meter usuarios en Exchange y automatizar la reutilización de datos como dominio, correo, OU y contraseña.',
+      'Corregida la función para meter usuarios en Exchange y automatizar la reutilizaci?n de datos como dominio, correo, OU y contraseña.',
       'Corregida la detección de RPC-over-HTTP-Proxy para que Exchange instale correctamente esa característica antes del Readiness Check.',
       'Mejorado el comprobador de características de Exchange, DC1 y DC2 con estados visibles por componente.',
-      'La consola muestra ahora ✓ verde en elementos instalados y ✗ roja en elementos pendientes o con error.',
+      'La consola muestra ahora OK verde en elementos instalados y X roja en elementos pendientes o con error.',
       'Ajustado el formulario Crear usuarios Exchange para que los campos, el botón Ver y las acciones no se corten en la columna izquierda.'
     ]
   },
@@ -217,7 +233,7 @@ export const changelogData: ChangelogItem[] = [
       'El formulario de creación de usuarios Exchange usa ahora campos desplazables y una zona fija de acciones.',
       'Los avisos al usuario ahora calculan altura dinámica y activan scroll interno cuando el texto no cabe en pantalla.',
       'Actualizados los prerrequisitos de Exchange con las características oficiales WCF y RPC requeridas por Exchange Server 2019.',
-      'Añadida verificación posterior de características Exchange para avisar exactamente qué componente sigue pendiente.',
+      'Añadida verificaci?n posterior de características Exchange para avisar exactamente qué componente sigue pendiente.',
       'Corregida la altura y reserva de espacio de los botones Sí/No en diálogos largos.',
       'Aumentado el ancho de los botones Sí/No en los diálogos de confirmación.',
       'Ajustado el texto de confirmación de RecoverServer Exchange.',
@@ -351,7 +367,7 @@ export const changelogData: ChangelogItem[] = [
       'Se han movido archivos para mejorar la eficiencia del programa.',
       'Organizados iconos y recursos visuales en una carpeta dedicada.',
       'Mejorado el empaquetado del ejecutable para incluir recursos visuales y herramientas auxiliares.',
-      'Limpieza de archivos antiguos y elementos duplicados de compilación.'
+      'Limpieza de archivos obsoletos y elementos duplicados de compilaci?n.'
     ]
   },
   {
@@ -360,7 +376,7 @@ export const changelogData: ChangelogItem[] = [
     changes: [
       'Añadido aviso visual cuando Switch Allied, Switch Cisco o Router finalizan con código 1.',
       'El aviso explica al usuario que revise cable de consola, driver USB/Serial, puerto COM o programas externos.',
-      'Corregida la configuración Cisco para VLANs, trunk y verificación por interfaz.',
+      'Corregida la configuraci?n Cisco para VLANs, trunk y verificaci?n por interfaz.',
       'Detectado VTP Client para avisar cuando Cisco no permite crear VLANs localmente.',
       'Añadida la pestaña Seguridad dentro de Guía rápida.'
     ]
@@ -379,7 +395,7 @@ export const changelogData: ChangelogItem[] = [
     version: '2.1.57',
     date: '29/04/2026',
     changes: [
-      'Corregida visualización de acentos, ñ y caracteres españoles en consola e interfaz.',
+      'Corregida visualizaci?n de acentos, ? y caracteres españoles en consola e interfaz.',
       'Separado el color del estado Admin y Recursos en la esquina inferior izquierda.',
       'Añadidos avisos más claros para errores que antes solo quedaban escritos en consola.',
       'Revisadas ventanas informativas para que el usuario deba aceptar mensajes importantes.'
@@ -390,7 +406,7 @@ export const changelogData: ChangelogItem[] = [
     date: '28/04/2026',
     changes: [
       'Corregidos botones Aceptar/Cancelar en diálogos de entrada como licencia Windows/KMS.',
-      'Revisadas ventanas modernas de entrada para evitar cajas antiguas y controles ocultos.',
+      'Revisadas ventanas modernas de entrada para evitar cajas obsoletas y controles ocultos.',
       'Mejorada la robustez del arranque y la captura de foco en la ventana inicial de licencia.',
       'Añadidas comprobaciones para reforzar el acceso inicial de la aplicación.'
     ]
@@ -401,7 +417,7 @@ export const changelogData: ChangelogItem[] = [
     changes: [
       'Revisado flujo de prerrequisitos SharePoint y AppFabric.',
       'Añadido desbloqueo de instaladores locales para evitar problemas de Zone.Identifier.',
-      'Añadida instalación y verificación específica de AppFabric y su actualización CU.',
+      'Añadida instalación y verificaci?n espec?fica de AppFabric y su actualización CU.',
       'Añadidos avisos de reinicio y botón Reiniciar sistema cuando SharePoint/AppFabric lo requiere.'
     ]
   },
@@ -432,7 +448,7 @@ export const changelogData: ChangelogItem[] = [
       'Ampliada Guía rápida con pestañas, explicaciones de Sistemas, Redes, Recursos, Consola y Errores.',
       'Corregido bloqueo de scroll al maximizar y abrir Guía rápida > Errores.',
       'Mejorada la herramienta Ping con ping continuo, repetir, cambiar destino y accesos a DNS/gateway.',
-      'Hecho dinámico el estado de discos para refrescar cambios sin reiniciar la app.'
+      'Hecho din?mico el estado de discos para refrescar cambios sin reiniciar la app.'
     ]
   },
   {
@@ -441,8 +457,8 @@ export const changelogData: ChangelogItem[] = [
     changes: [
       'Añadido panel Estado de discos en Inicio con acceso a Disk Management.',
       'El panel se adapta en altura cuando hay más unidades para no cortar información.',
-      'Añadido refresco periódico del estado de discos.',
-      'Mejorado el botón Disk Management para seguir el patrón visual de las tarjetas.'
+      'Añadido refresco peri?dico del estado de discos.',
+      'Mejorado el botón Disk Management para seguir el patr?n visual de las tarjetas.'
     ]
   },
   {
@@ -469,7 +485,7 @@ export const changelogData: ChangelogItem[] = [
     version: '2.1.16',
     date: '20/04/2026',
     changes: [
-      'Añadida opción Prepare Schema dentro de Exchange.',
+      'Añadida opci?n Prepare Schema dentro de Exchange.',
       'Se solicitan dominio y Organization Name antes de preparar AD/schema.',
       'Se comprueba conectividad con ping antes de ejecutar comandos de Exchange.',
       'PrepareSchema, PrepareAD y PrepareAllDomains se ejecutan por consola con barra de progreso.'
@@ -510,9 +526,9 @@ export const changelogData: ChangelogItem[] = [
     date: '29/03/2026',
     changes: [
       'Mejoradas ventanas modernas de entrada para licencia, dominio, KMS y datos solicitados al usuario.',
-      'Unificadas ventanas de información para eliminar cajas antiguas de Windows cuando era posible.',
-      'Mejorado redimensionado de pantalla y aparición de scroll solo cuando el contenido no cabe.',
-      'Añadida recomendación de compilación segura con PyInstaller, UPX y licencia en hash.'
+      'Unificadas ventanas de información para eliminar cajas obsoletas de Windows cuando era posible.',
+      'Mejorado redimensionado de pantalla y aparici?n de scroll solo cuando el contenido no cabe.',
+      'Añadida recomendaci?n de compilaci?n segura con PyInstaller, UPX y licencia en hash.'
     ]
   },
   {
@@ -549,7 +565,7 @@ export const changelogData: ChangelogItem[] = [
     version: '1.9.0',
     date: '25/01/2026',
     changes: [
-      'Cierre de la rama antigua antes del rediseño moderno.',
+      'Cierre de la rama previa antes del rediseño moderno.',
       'La app queda como instalador monolítico con SharePoint roles, SharePoint prerrequisitos, KMS y botones reservados.',
       'Se mantiene una sola ventana con logo, botones, barra de progreso, porcentaje y consola interna.'
     ]
@@ -560,8 +576,8 @@ export const changelogData: ChangelogItem[] = [
     changes: [
       'Pulida la ventana principal CustomTkinter con centrado, tamaño mínimo y layout por columnas.',
       'Añadido logo visible en la pantalla principal usando recursos empaquetables.',
-      'Añadido pie de página con autoría y marca Beta 0.2.',
-      'Preparado el aspecto final de la rama antigua antes del cambio grande de interfaz.'
+      'Añadido pie de página con autor?a y marca Beta 0.2.',
+      'Preparado el aspecto final de la rama previa antes del cambio grande de interfaz.'
     ]
   },
   {
@@ -589,7 +605,7 @@ export const changelogData: ChangelogItem[] = [
     date: '19/12/2025',
     changes: [
       'Añadida activación KMS con comandos /ipk, /skms y /ato.',
-      'Añpado cambio de edición con DISM /Set-Edition para Server Datacenter.',
+      'Añadido cambio de edición con DISM /Set-Edition para Server Datacenter.',
       'Añadidas claves genéricas por versión de Windows Server y Windows 10 Pro.',
       'Añadida comprobación básica de servidor KMS mediante ping.',
       'Añadida detección de edición actual de Windows con DISM.',
@@ -652,3 +668,4 @@ export const changelogData: ChangelogItem[] = [
     ]
   }
 ];
+

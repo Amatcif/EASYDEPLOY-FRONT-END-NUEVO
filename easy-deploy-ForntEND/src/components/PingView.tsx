@@ -24,6 +24,8 @@ interface PingViewProps {
   lastPingResult: Record<string, unknown>;
 }
 
+const FAVORITES_STORAGE_KEY = 'easydeploy-ping-favorites';
+
 function asFavorites(value: unknown): PingFavorite[] {
   if (!Array.isArray(value)) return [];
   return value
@@ -46,7 +48,13 @@ export default function PingView({ onAppendLog, onRunAction, favoritesData, last
   const [name, setName] = useState('');
   const [interval, setIntervalValue] = useState(2);
   const [cards, setCards] = useState<PingCard[]>([]);
-  const [favorites, setFavorites] = useState<PingFavorite[]>([]);
+  const [favorites, setFavorites] = useState<PingFavorite[]>(() => {
+    try {
+      return asFavorites(JSON.parse(localStorage.getItem(FAVORITES_STORAGE_KEY) || '[]'));
+    } catch (_) {
+      return [];
+    }
+  });
   const timers = useRef<Map<string, ReturnType<typeof setInterval>>>(new Map());
 
   useEffect(() => {
@@ -58,7 +66,11 @@ export default function PingView({ onAppendLog, onRunAction, favoritesData, last
   }, []);
 
   useEffect(() => {
-    setFavorites(asFavorites(favoritesData));
+    const backendFavorites = asFavorites(favoritesData);
+    if (backendFavorites.length || Array.isArray(favoritesData)) {
+      setFavorites(backendFavorites);
+      localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(backendFavorites));
+    }
   }, [favoritesData]);
 
   useEffect(() => {
@@ -130,10 +142,16 @@ export default function PingView({ onAppendLog, onRunAction, favoritesData, last
       onAppendLog('PING', 'warning', 'Introduce una IP o nombre DNS para guardar en Favoritos.');
       return;
     }
+    const next = [...favorites.filter((item) => item.host.toLowerCase() !== target.toLowerCase()), { host: target, name: name.trim() || target }];
+    setFavorites(next);
+    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(next));
     onRunAction('ping.add_favorite', { host: target, name: name.trim(), stayOnPage: true });
   };
 
   const deleteFavorite = (target: string) => {
+    const next = favorites.filter((item) => item.host.toLowerCase() !== target.toLowerCase());
+    setFavorites(next);
+    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(next));
     onRunAction('ping.delete_favorite', { host: target, stayOnPage: true });
   };
 
@@ -166,10 +184,10 @@ export default function PingView({ onAppendLog, onRunAction, favoritesData, last
               <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--theme-text-secondary)' }}>Segundos</span>
               <input type="number" min={1} value={interval} onChange={(event) => setIntervalValue(Number(event.target.value || 1))} className="w-full px-3 py-2 rounded-lg border text-sm bg-transparent" style={{ borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)' }} />
             </label>
-            <button onClick={() => addPing()} className="px-4 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2" style={{ backgroundColor: 'var(--theme-accent-primary)', color: '#fff' }}>
+            <button onClick={() => addPing()} className="px-4 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 cursor-pointer" style={{ backgroundColor: 'var(--theme-accent-primary)', color: '#fff' }}>
               <Play size={13} fill="currentColor" /> Añadir ping
             </button>
-            <button onClick={saveFavorite} className="px-4 py-2 rounded-lg border text-xs font-bold flex items-center justify-center gap-2" style={{ backgroundColor: 'var(--theme-bg-well)', borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)' }}>
+            <button onClick={saveFavorite} className="px-4 py-2 rounded-lg border text-xs font-bold flex items-center justify-center gap-2 cursor-pointer" style={{ backgroundColor: 'var(--theme-bg-well)', borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)' }}>
               <BookmarkPlus size={13} /> Favorito
             </button>
           </div>
@@ -195,7 +213,7 @@ export default function PingView({ onAppendLog, onRunAction, favoritesData, last
                     <button
                       type="button"
                       onClick={() => removePing(card.id)}
-                      className="w-8 h-8 rounded-lg border flex items-center justify-center font-bold"
+                      className="w-8 h-8 rounded-lg border flex items-center justify-center font-bold cursor-pointer"
                       title="Cerrar este ping"
                       style={{ borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)', backgroundColor: 'var(--theme-bg-well)' }}
                     >
@@ -205,7 +223,7 @@ export default function PingView({ onAppendLog, onRunAction, favoritesData, last
                   <pre className="text-[11px] leading-relaxed max-h-40 overflow-auto whitespace-pre-wrap rounded-xl p-3 border" style={{ backgroundColor: 'var(--theme-bg-well)', borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)' }}>{card.lastOutput}</pre>
                   <div className="flex items-center justify-between text-[10px]" style={{ color: 'var(--theme-text-secondary)' }}>
                     <span>Última comprobación: {card.lastChecked}</span>
-                    <button onClick={() => card.running ? stopPing(card.id) : startPing(card)} className="px-3 py-1.5 rounded-lg border flex items-center gap-1.5" style={{ borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)' }}>
+                    <button onClick={() => card.running ? stopPing(card.id) : startPing(card)} className="px-3 py-1.5 rounded-lg border flex items-center gap-1.5 cursor-pointer" style={{ borderColor: 'var(--theme-border-well)', color: 'var(--theme-text-primary)' }}>
                       {card.running ? <Square size={11} /> : <Play size={11} fill="currentColor" />} {card.running ? 'Parar' : 'Iniciar'}
                     </button>
                   </div>
@@ -223,11 +241,11 @@ export default function PingView({ onAppendLog, onRunAction, favoritesData, last
             )}
             {favorites.map((item) => (
               <div key={item.host} className="border rounded-xl p-3 flex items-center justify-between gap-2" style={{ borderColor: 'var(--theme-border-well)', backgroundColor: 'var(--theme-bg-well)' }}>
-                <button className="text-left min-w-0 flex-1" onClick={() => addPing(item.host, item.name || item.host)}>
+                <button className="text-left min-w-0 flex-1 cursor-pointer" onClick={() => addPing(item.host, item.name || item.host)}>
                   <span className="block text-xs font-bold truncate" style={{ color: 'var(--theme-text-primary)' }}>{item.name || item.host}</span>
                   <span className="block text-[10px] font-mono truncate" style={{ color: 'var(--theme-text-secondary)' }}>{item.host}</span>
                 </button>
-                <button onClick={() => deleteFavorite(item.host)} className="p-2 rounded-lg border" style={{ borderColor: 'var(--theme-border-well)', color: '#ef4444' }}>
+                <button onClick={() => deleteFavorite(item.host)} className="p-2 rounded-lg border cursor-pointer" style={{ borderColor: 'var(--theme-border-well)', color: '#ef4444' }}>
                   <Trash2 size={13} />
                 </button>
               </div>
@@ -238,3 +256,4 @@ export default function PingView({ onAppendLog, onRunAction, favoritesData, last
     </div>
   );
 }
+
