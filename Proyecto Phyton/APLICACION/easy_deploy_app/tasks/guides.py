@@ -24,6 +24,7 @@ class GuidesTasksMixin:
         "Guía Sharepoint": "GUIA SHAREPOINT.pdf",
         "Guía Certificados": "GUIA CERTIFICADOS.pdf",
         "Guía DHCP": "GUIA DHCP.pdf",
+        "Guía File Server": "GUIA FILE SERVER.pdf",
         "Guía WDS": "GUIA WDS.pdf",
         "Guía WSUS": "GUIA WSUS.pdf",
     }

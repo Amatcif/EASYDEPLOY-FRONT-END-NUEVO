@@ -25,7 +25,7 @@ from ..tasks.skype import (
 
 DEFAULT_UPDATE_URL = (
     "https://www.dropbox.com/scl/fi/p8qbe0fzn17nk7qdah75x/update.json"
-    "?rlkey=7yb1odpc9aptdrek0mk7iafgk&st=3yg87fc3&dl=1"
+    "?rlkey=7yb1odpc9aptdrek0mk7iafgk&st=na1ikvk4&dl=1"
 )
 
 
@@ -196,10 +196,13 @@ class ActionRegistry:
             "activation.status": self.activation_status,
             "activation.activate": self.activation_activate,
             "activation.trial_status": self.activation_status,
+            "config.network_adapters": self.network_adapters,
         }
         for guide_name, action_id in {
             "Guía DC1": "guides.open_dc1",
             "Guía DC2": "guides.open_dc2",
+            "Guía Intercambio Roles": "guides.open_fsmo",
+            "Guía Relación de Confianza": "guides.open_trust",
             "Guía Exchange": "guides.open_exchange",
             "Guía Skype": "guides.open_skype",
             "Guía Jchat": "guides.open_jchat",
@@ -207,6 +210,7 @@ class ActionRegistry:
             "Guía D2 D4": "guides.open_d2d4",
             "Guía Certificados": "guides.open_certificates",
             "Guía DHCP": "guides.open_dhcp",
+            "Guía File Server": "guides.open_file_server",
             "Guía WDS": "guides.open_wds",
             "Guía WSUS": "guides.open_wsus",
         }.items():
@@ -322,7 +326,7 @@ class ActionRegistry:
     def pending_complex_form(self, payload):
         message = (
             "Formulario complejo pendiente de migración visual. "
-            "La lógica antigua se conserva en easy_deploy_app y no se ha duplicado."
+            "La lógica interna se conserva en easy_deploy_app y no se ha duplicado."
         )
         self.host.sink.emit("log", source="BRIDGE", level="warning", message=message)
         return {"ok": False, "pending": True, "message": message}
@@ -440,6 +444,48 @@ class ActionRegistry:
         )
         return {"enabled": enabled}
 
+    def network_adapters(self, payload=None):
+        command = r"""
+$items = Get-NetIPConfiguration | ForEach-Object {
+  $adapter = Get-NetAdapter -InterfaceIndex $_.InterfaceIndex -ErrorAction SilentlyContinue
+  $ipv4 = $_.IPv4Address | Select-Object -First 1
+  $gw = $_.IPv4DefaultGateway | Select-Object -First 1
+  $dns = $_.DNSServer.ServerAddresses | Where-Object { $_ -match '^\d+\.' } | Select-Object -First 2
+  [PSCustomObject]@{
+    id = [string]$_.InterfaceIndex
+    name = [string]$_.InterfaceAlias
+    status = if ($adapter) { [string]$adapter.Status } else { '' }
+    ip = if ($ipv4) { [string]$ipv4.IPAddress } else { '' }
+    gateway = if ($gw) { [string]$gw.NextHop } else { '' }
+    dns1 = if ($dns.Count -ge 1) { [string]$dns[0] } else { '' }
+    dns2 = if ($dns.Count -ge 2) { [string]$dns[1] } else { '' }
+    mac = if ($adapter) { [string]$adapter.MacAddress } else { '' }
+    speed = if ($adapter) { [string]$adapter.LinkSpeed } else { '' }
+  }
+}
+$items | ConvertTo-Json -Depth 4
+"""
+        ok, output = SysUtils.run_powershell(command, capture=True, timeout=35)
+        adapters = []
+        if ok and output.strip():
+            try:
+                parsed = json.loads(output)
+                if isinstance(parsed, dict):
+                    adapters = [parsed]
+                elif isinstance(parsed, list):
+                    adapters = parsed
+            except Exception as exc:
+                ok = False
+                output = f"{output}\n{exc}"
+        self.host.sink.emit("data", name="config.network_adapters", value={"ok": ok, "adapters": adapters})
+        self.host.sink.emit(
+            "log",
+            source="NETWORK",
+            level="success" if ok else "warning",
+            message=f"Adaptadores reales detectados: {len(adapters)}." if ok else "No se pudieron leer adaptadores de red.",
+        )
+        return {"ok": ok, "adapters": adapters, "raw": "" if ok else output}
+
     def system_info(self, payload):
         commands = [
             ["cmd.exe", "/c", "hostname"],
@@ -554,8 +600,8 @@ class ActionRegistry:
     def credits(self, payload):
         message = (
             "Easy Deploy\n"
-            "Autoría y créditos disponibles en la aplicación antigua. "
-            "La ventana visual completa queda pendiente de migración al front-end nuevo."
+            "Autoría y créditos disponibles en la aplicación interna. "
+            "La ventana visual completa queda pendiente de migraci?n al front-end nuevo."
         )
         self.host.sink.emit("notification", level="info", title="Créditos", message=message)
         return {"message": message}
@@ -605,7 +651,16 @@ class ActionRegistry:
         url = str((payload or {}).get("url") or "").strip() or load_update_settings().get("url", DEFAULT_UPDATE_URL)
         data = fetch_update_json(url)
         remote_version = str(data.get("version") or "").strip()
-        installer_url = str(data.get("url") or data.get("downloadUrl") or data.get("download_url") or "").strip()
+        installer_url = normalize_dropbox_download_url(
+            str(
+                data.get("url")
+                or data.get("downloadUrl")
+                or data.get("downloadURL")
+                or data.get("download_url")
+                or data.get("installer_url")
+                or ""
+            ).strip()
+        )
         filename = str(data.get("filename") or "").strip()
         sha256 = str(data.get("sha256") or "").strip()
         mandatory = bool(data.get("mandatory", False))
@@ -696,7 +751,6 @@ class ActionRegistry:
             "$ErrorActionPreference = 'SilentlyContinue'\r\n"
             f"$installer = '{installer_literal}'\r\n"
             f"$self = '{helper_literal}'\r\n"
-            "Start-Sleep -Seconds 2\r\n"
             "$proc = Start-Process -FilePath $installer -PassThru\r\n"
             "if ($proc) { Wait-Process -Id $proc.Id }\r\n"
             "for ($i = 0; $i -lt 25; $i++) {\r\n"
@@ -734,3 +788,4 @@ class ActionRegistry:
             raise
         self.host.sink.emit("restart_required", installer=str(installer))
         return {"launched": True, "installer": str(installer)}
+

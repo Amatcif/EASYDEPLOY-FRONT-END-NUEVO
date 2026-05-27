@@ -150,7 +150,7 @@ class SysUtils:
 
     @staticmethod
     def decode_process_bytes(data, prefer_utf8=False):
-        """Decodifica salida de procesos evitando textos tipo 'm?s' o 'ra├¡z'."""
+        """Decodifica salida de procesos evitando textos tipo 'más' o 'ra├¡z'."""
         if not data:
             return ""
         if isinstance(data, str):

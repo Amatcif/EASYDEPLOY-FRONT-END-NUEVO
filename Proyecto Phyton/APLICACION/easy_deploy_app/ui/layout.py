@@ -3077,7 +3077,7 @@ class LayoutMixin:
         self._build_adaptive_page(f, populate)
 
     def _default_update_url(self):
-        return "https://www.dropbox.com/scl/fi/p8qbe0fzn17nk7qdah75x/update.json?rlkey=7yb1odpc9aptdrek0mk7iafgk&st=3yg87fc3&dl=1"
+        return "https://www.dropbox.com/scl/fi/p8qbe0fzn17nk7qdah75x/update.json?rlkey=7yb1odpc9aptdrek0mk7iafgk&st=na1ikvk4&dl=1"
 
     def _update_settings_path(self):
         return os.path.join(SysUtils.app_data_dir(), "update_settings.json")
@@ -3454,7 +3454,7 @@ class LayoutMixin:
 
             ctk.CTkLabel(
                 card,
-                text="RUTA DEL ENDPOINT UPDATE.JSON",
+                text="RUTA DEL ENDPOINT",
                 font=("Consolas", 10, "bold"),
                 text_color=(self.colors["text_muted_light"], self.colors["text_muted_dark"]),
                 anchor="w",
@@ -3555,7 +3555,7 @@ class LayoutMixin:
             self._page_title(
                 page,
                 "Historial de versiones",
-                "Cambios publicados de Easy Deploy, ordenados de más reciente a más antiguo.",
+                "Cambios publicados de Easy Deploy, ordenados de más reciente a más anterior.",
             )
 
             for row, entry in enumerate(CHANGELOG, start=2):

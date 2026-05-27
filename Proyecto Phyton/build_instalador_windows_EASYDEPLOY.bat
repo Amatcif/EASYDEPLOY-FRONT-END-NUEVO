@@ -89,7 +89,7 @@ if errorlevel 1 (
 echo [3/7] Compilando backend Python JSONL con PyInstaller...
 if exist "%FRONTEND_DIR%\backend_dist" rmdir /s /q "%FRONTEND_DIR%\backend_dist"
 if exist "%FRONTEND_DIR%\backend_build" rmdir /s /q "%FRONTEND_DIR%\backend_build"
-py -3 -m PyInstaller --clean --noconfirm --onefile --console --name "EasyDeploy back" --distpath "%FRONTEND_DIR%\backend_dist" --workpath "%FRONTEND_DIR%\backend_build" --specpath "%FRONTEND_DIR%\backend_build" "%APP_DIR%\easy_deploy_backend_launcher.py"
+py -3 -m PyInstaller --clean --noconfirm --onefile --console --name "EasyDeploy back" --distpath "%FRONTEND_DIR%\backend_dist" --workpath "%FRONTEND_DIR%\backend_build" --specpath "%FRONTEND_DIR%\backend_build" --hidden-import serial --hidden-import serial.tools.list_ports --hidden-import easy_deploy_app.network_tools --hidden-import easy_deploy_app.network_tools.switchCONF --hidden-import easy_deploy_app.network_tools.switchCisco --hidden-import easy_deploy_app.network_tools.r3 --hidden-import easy_deploy_app.network_tools.addressing --hidden-import easy_deploy_app.network_tools.asa --hidden-import easy_deploy_app.network_tools.checkpoint --hidden-import easy_deploy_app.network_tools.topology "%APP_DIR%\easy_deploy_backend_launcher.py"
 if errorlevel 1 (
     popd
     echo ERROR: Fallo PyInstaller compilando EasyDeploy back.exe.

@@ -1,9 +1,25 @@
 """Historial visible de cambios de Easy Deploy.
-Orden obligatorio: de más reciente a más antiguo.
-Cada fecha debe mostrarse con la versión más alta de ese día.
+Orden obligatorio: de más reciente a más interno.
+Cada fecha debe mostrarse con la versión más alta de ese d?a.
 """
 
 CHANGELOG = [
+    (
+        '2.2.5.31',
+        '27/05/2026',
+        [
+            'Reparado flujo de actualización y lanzamiento silencioso del instalador.',
+            'Corregido foco global de prompts y textboxes.',
+            'Restaurados formularios completos AD/Exchange y D2/D4.',
+            'Restauradas herramientas interactivas Allied/Cisco/Router mediante backend Python.',
+            'Corregidos favoritos y estados visuales del monitor Ping.',
+            'Sincronizado estado visual de Firewall.',
+            'Adaptadores de red ahora muestran datos reales.',
+            'Corregido tema blanco en consola.',
+            'Eliminadas referencias de compatibilidad no orientadas al usuario.',
+            'Revisados actionMap, registry y botones completos.',
+        ],
+    ),
     (
         '2.2.5.28',
         '26/05/2026',
@@ -32,8 +48,8 @@ CHANGELOG = [
         '2.2.5.26',
         '26/05/2026',
         [
-            'Añadido bloqueo global de ejecución para impedir iniciar otra tarea mientras una acción sigue activa.',
-            'Añadido botón Cancelar en la consola para solicitar la detención de tareas, procesos y prompts activos.',
+            'Añadido bloqueo global de ejecuci?n para impedir iniciar otra tarea mientras una acci?n sigue activa.',
+            'Añadido botón Cancelar en la consola para solicitar la detenci?n de tareas, procesos y prompts activos.',
             'Corregido el flujo del actualizador para esperar al lanzamiento real del instalador antes de cerrar Easy Deploy.',
             'Mejorado el helper de actualización para ejecutar el instalador de forma desacoplada y borrar el archivo descargado al terminar.',
             'Aplicado cursor de mano a botones Ejecutar de KMS, SharePoint, SQL Server 2022 y JCHAT.',
@@ -47,7 +63,7 @@ CHANGELOG = [
             'Pulida pestaña Actualizaciones: ocultadas URL/SHA/instalador y añadida barra de descarga.',
             'Añadido flujo de descarga, aviso de cierre, lanzamiento de instalador y limpieza posterior mediante helper.',
             'Corregidos avisos de Privilegios, confirmación al cambiar endpoint update.json y apertura de Logs.',
-            'Mejorado el foco de prompts React para KMS, AD, Exchange, dominio y entradas antiguas.',
+            'Mejorado el foco de prompts React para KMS, AD, Exchange, dominio y entradas internas.',
             'La consola limpia la salida al iniciar una tarea nueva y añade acceso directo a Logs.',
             'Mejorado Monitor de ping con estados verde/rojo/gris y botón X para cerrar cada ping.',
             'Reforzada apertura de herramientas interactivas de red Allied, Cisco y Router.',
@@ -61,7 +77,7 @@ CHANGELOG = [
             'Movido Net Framework 3.5 a Instaladores Offline e incluido en Instalar todo el arsenal.',
             'Movido Forzar políticas GPO a Herramientas > Sistema.',
             'Eliminado bloque técnico visible de versión/bridge/teclado/preload y Sincronización y Directorio.',
-            'Añadidos prompts React para Ping, usuarios AD/Exchange, dominio y acciones antiguas que pedían datos.',
+            'Añadidos prompts React para Ping, usuarios AD/Exchange, dominio y acciones internas que ped?an datos.',
             'Recursos, Logs y Actualizaciones muestran resultado sin redirigir innecesariamente a consola.',
         ],
     ),
@@ -69,22 +85,22 @@ CHANGELOG = [
         '2.2.5.23',
         '26/05/2026',
         [
-           'Corregido mapeo de botones del nuevo front-end contra Easy Deploy clásico.',
+           'Corregido mapeo de botones del nuevo front-end contra Easy Deploy interno.',
            'Restaurado comportamiento de redirección automática a consola para acciones reales.',
            'Restauradas funciones reales de Recursos, Top procesos, Roles instalados, Comprobar entorno y Ping.',
            'Mejorada pestaña Actualizaciones para mostrar resultado en la propia pantalla.',
-           'Limpieza de textos, tildes, ñ, etiquetas antiguas y elementos visuales no funcionales.',
+           'Limpieza de textos, tildes, ?, etiquetas obsoletas y elementos visuales no funcionales.',
            'Limpieza segura de zona de trabajo moviendo duplicados a carpeta de archivo cuando procede.',
-           'Desactivada la aceleración gráfica de Electron para mejorar el arranque en Windows Server 2019.',
+           'Desactivada la aceleraci?n gráfica de Electron para mejorar el arranque en Windows Server 2019.',
            'Añadido diagnóstico de compatibilidad GPU al log de arranque sin cambiar el bridge ni las tareas reales.',
-           'Corregida la exposición de preload en Electron con pingPreload visible desde el renderer.',
+           'Corregida la exposici?n de preload en Electron con pingPreload visible desde el renderer.',
            'Reforzado el bridge Electron/Python con logs diferenciados de cliente, Electron, backend y registro de acciones Python.',
            'Añadido self-test seguro del backend Python y dry-run para validar acciones peligrosas sin ejecutarlas.',
-           'Limpieza de builds Electron para evitar empaquetar o instalar artefactos antiguos.',
+           'Limpieza de builds Electron para evitar empaquetar o instalar artefactos obsoletos.',
            'Migrado front-end principal a React/Electron manteniendo backend Python de Easy Deploy.',
-           'Conectadas acciones principales del nuevo front-end con funciones reales del motor antiguo.',
+           'Conectadas acciones principales del nuevo front-end con funciones reales del motor interno.',
            'Añadido bridge seguro Electron/Python con logs, progreso y prompts.',
-           'Adaptado build/instalador con clave de activación única por compilación.',
+           'Adaptado build/instalador con clave de activación única por compilaci?n.',
            'Añadida y probada función actualizar APP mediante internet.',
             'Añadida pantalla Actualizar con endpoint JSON configurable para comprobar versiones remotas desde Dropbox.',
             'Añadido flujo de descarga y lanzamiento de instalador de actualización con limpieza posterior del archivo descargado.',
@@ -131,7 +147,7 @@ CHANGELOG = [
             'Corregido el estado visual de Recursos para actualizarse al momento si faltan archivos tras abrir la aplicación.',
             'Alineado el comprobador de recursos con Skype Server, prerrequisitos offline y nuevas guías Skype/D2-D4.',
             'Corregido falso positivo visual en consola para que la característica Web-Http-Errors de IIS no aparezca marcada como error durante los prerrequisitos de Skype.',
-            'Corregido arranque de tareas desde consola añadiendo la importación re que necesitaba layout.py para el filtrado visual de líneas como Web-Http-Errors.',
+            'Corregido arranque de tareas desde consola añadiendo la importaci?n re que necesitaba layout.py para el filtrado visual de líneas como Web-Http-Errors.',
         ],
     ),
     (
@@ -144,17 +160,17 @@ CHANGELOG = [
             'Corregido Permisos a usuario Skype para evitar error de sintaxis PowerShell al informar grupos por SID y permitir continuar con la asignación de Schema Admins, Enterprise Admins y Domain Admins.',
             'Corregido Permisos a usuario Skype para resolver grupos AD por SID/DN de forma robusta y evitar Identity vacío al añadir Schema Admins, Enterprise Admins o Domain Admins.',
             'Corregido Permisos a usuario Skype para tratar correctamente objetos AD devueltos por PowerShell y evitar el error System.Object[].',
-            'Rehecha la función Permisos a usuario de Skype reutilizando la lógica robusta de Crear usuarios AD: comprobación previa informativa y ejecución real mediante script PowerShell temporal.',
+            'Rehecha la función Permisos a usuario de Skype reutilizando la lógica robusta de Crear usuarios AD: comprobación previa informativa y ejecuci?n real mediante script PowerShell temporal.',
             'Corregido Permisos a usuario de Skype con comprobación previa de entorno AD/RSAT, botón recolocado abajo y salida PowerShell con tildes reparada.',
-            'Añadido botón Permisos a usuario en Skype para comprobar y asignar grupos AD/RBAC necesarios para instalación y administración.',
+            'Añadido botón Permisos a usuario en Skype para comprobar y asignar grupos AD/RBAC necesarios para instalación y administraci?n.',
             'Corregida la comprobación de entorno AD del botón Permisos a usuario Skype para evitar falsos negativos en controladores de dominio y mejorar la lectura de tildes en consola.',
-            'Añadido botón Créditos junto a Versiones con reparto de autoría y aviso legal de derechos reservados.',
+            'Añadido botón Créditos junto a Versiones con reparto de autor?a y aviso legal de derechos reservados.',
             'Mejorados los prerrequisitos de Skype para instalación offline usando Sources\\SxS y aviso de que Windows Features puede tardar varios minutos.',
             'La consola de Skype mueve la barra de progreso por fases durante prerrequisitos largos y muestra Reiniciar sistema cuando Windows deja reinicio pendiente.',
             'Corregidos falsos positivos de consola para que nombres técnicos como Web-Http-Errors no aparezcan como error rojo.',
             'Integrado Skype for Business Server con submenú propio: prerrequisitos e instalación desde ISO.',
             'Actualizado el comprobador de recursos para validar ISO y prerrequisitos de Skype, además de las nuevas guías.',
-            'Añadidas Guía Skype y Guía D2 D4 al apartado Guías, abriéndose como el resto de PDFs.',
+            'Añadidas Guía Skype y Guía D2 D4 al apartado Guías, abri?ndose como el resto de PDFs.',
             'Añadidos botones Repadmin y D2 D4 en Controlador de dominio.',
             'Mejorado el asistente D2/D4 DFSR SYSVOL con una interfaz más guiada y minimalista.',
             'Ajustado el logo lateral para quedar más grande y centrado.',
@@ -170,10 +186,10 @@ CHANGELOG = [
         '2.2.1',
         '15/05/2026',
         [
-            'Corregida la función para meter usuarios en Exchange y automatizar la reutilización de datos como dominio, correo, OU y contraseña.',
+            'Corregida la función para meter usuarios en Exchange y automatizar la reutilizaci?n de datos como dominio, correo, OU y contraseña.',
             'Corregida la detección de RPC-over-HTTP-Proxy para que Exchange instale correctamente esa característica antes del Readiness Check.',
             'Mejorado el comprobador de características de Exchange, DC1 y DC2 con estados visibles por componente.',
-            'La consola muestra ahora ✓ verde en elementos instalados y ✗ roja en elementos pendientes o con error.',
+            'La consola muestra ahora OK verde en elementos instalados y X roja en elementos pendientes o con error.',
             'Ajustado el formulario Crear usuarios Exchange para que los campos, el botón Ver y las acciones no se corten en la columna izquierda.',
         ],
     ),
@@ -185,9 +201,9 @@ CHANGELOG = [
             'El formulario de creación de usuarios Exchange usa ahora campos desplazables y una zona fija de acciones.',
             'Los avisos al usuario ahora calculan altura dinámica y activan scroll interno cuando el texto no cabe en pantalla.',
             'Actualizados los prerrequisitos de Exchange con las características oficiales WCF y RPC requeridas por Exchange Server 2019.',
-            'Añadida verificación posterior de características Exchange para avisar exactamente qué componente sigue pendiente.',
-            'Corregida la altura y reserva de espacio de los botones Sí/No en diálogos largos.',
-            'Aumentado el ancho de los botones Sí/No en los diálogos de confirmación.',
+            'Añadida verificaci?n posterior de características Exchange para avisar exactamente qué componente sigue pendiente.',
+            'Corregida la altura y reserva de espacio de los botones Sí/No en di?logos largos.',
+            'Aumentado el ancho de los botones Sí/No en los di?logos de confirmación.',
             'Ajustado el texto de confirmación de RecoverServer Exchange.',
             'Renombrado el acceso de Exchange a RecoverServer Exchange para evitar confundirlo con una limpieza de Active Directory.',
             'Office + Skype ahora usa la carpeta offline preparada con setup.exe, configuration.xml y archivos Office descargados.',
@@ -205,7 +221,7 @@ CHANGELOG = [
         [
             'Añadido botón RecoverServer Exchange dentro de Exchange para ejecutar recuperación oficial de servidor de forma guiada.',
             'RecoverServer monta el medio de Exchange desde recursos, usa /Mode:RecoverServer y detecta /TargetDir si Exchange estaba en ruta personalizada.',
-            'Añadidos avisos específicos para RecoverServer sobre nombre de equipo, permisos, versión CU, ruta personalizada y reinicio pendiente.',
+            'Añadidos avisos espec?ficos para RecoverServer sobre nombre de equipo, permisos, versión CU, ruta personalizada y reinicio pendiente.',
             'Añadido botón Office + Skype dentro de Programas.',
             'Añadida instalación conjunta offline de Office y Skype for Business mediante configuration.xml y Office Deployment Tool.',
             'Añadida detección automática de Product ID compatible con el medio Office incluido en recursos.',
@@ -319,7 +335,7 @@ CHANGELOG = [
             'Se han movido archivos para mejorar la eficiencia del programa.',
             'Organizados iconos y recursos visuales en una carpeta dedicada.',
             'Mejorado el empaquetado del ejecutable para incluir recursos visuales y herramientas auxiliares.',
-            'Limpieza de archivos antiguos y elementos duplicados de compilación.',
+            'Limpieza de archivos obsoletos y elementos duplicados de compilaci?n.',
         ],
     ),
     (
@@ -328,7 +344,7 @@ CHANGELOG = [
         [
             'Añadido aviso visual cuando Switch Allied, Switch Cisco o Router finalizan con código 1.',
             'El aviso explica al usuario que revise cable de consola, driver USB/Serial, puerto COM o programas externos.',
-            'Corregida la configuración Cisco para VLANs, trunk y verificación por interfaz.',
+            'Corregida la configuraci?n Cisco para VLANs, trunk y verificaci?n por interfaz.',
             'Detectado VTP Client para avisar cuando Cisco no permite crear VLANs localmente.',
             'Añadida la pestaña Seguridad dentro de Guía rápida.',
         ],
@@ -347,7 +363,7 @@ CHANGELOG = [
         '2.1.57',
         '29/04/2026',
         [
-            'Corregida visualización de acentos, ñ y caracteres españoles en consola e interfaz.',
+            'Corregida visualizaci?n de acentos, ? y caracteres españoles en consola e interfaz.',
             'Separado el color del estado Admin y Recursos en la esquina inferior izquierda.',
             'Añadidos avisos más claros para errores que antes solo quedaban escritos en consola.',
             'Revisadas ventanas informativas para que el usuario deba aceptar mensajes importantes.',
@@ -357,8 +373,8 @@ CHANGELOG = [
         '2.1.53',
         '28/04/2026',
         [
-            'Corregidos botones Aceptar/Cancelar en diálogos de entrada como licencia Windows/KMS.',
-            'Revisadas ventanas modernas de entrada para evitar cajas antiguas y controles ocultos.',
+            'Corregidos botones Aceptar/Cancelar en di?logos de entrada como licencia Windows/KMS.',
+            'Revisadas ventanas modernas de entrada para evitar cajas obsoletas y controles ocultos.',
             'Mejorada la robustez del arranque y la captura de foco en la ventana inicial de licencia.',
             'Añadidas comprobaciones para reforzar el acceso inicial de la aplicación.',
         ],
@@ -369,7 +385,7 @@ CHANGELOG = [
         [
             'Revisado flujo de prerrequisitos SharePoint y AppFabric.',
             'Añadido desbloqueo de instaladores locales para evitar problemas de Zone.Identifier.',
-            'Añadida instalación y verificación específica de AppFabric y su actualización CU.',
+            'Añadida instalación y verificaci?n espec?fica de AppFabric y su actualización CU.',
             'Añadidos avisos de reinicio y botón Reiniciar sistema cuando SharePoint/AppFabric lo requiere.',
         ],
     ),
@@ -379,7 +395,7 @@ CHANGELOG = [
         [
             'Mejorado SharePoint para detectar roles y prerrequisitos ya instalados antes de reinstalar.',
             'Añadidos mensajes de confirmación cuando no hay nada pendiente por instalar.',
-            'Ajustada extracción de ISO/CD para esperar confirmación del usuario y no tapar instaladores.',
+            'Ajustada extracci?n de ISO/CD para esperar confirmación del usuario y no tapar instaladores.',
             'Actualizada tarjeta SharePoint a Prerrequisitos y SharePoint.',
         ],
     ),
@@ -400,7 +416,7 @@ CHANGELOG = [
             'Ampliada Guía rápida con pestañas, explicaciones de Sistemas, Redes, Recursos, Consola y Errores.',
             'Corregido bloqueo de scroll al maximizar y abrir Guía rápida > Errores.',
             'Mejorada la herramienta Ping con ping continuo, repetir, cambiar destino y accesos a DNS/gateway.',
-            'Hecho dinámico el estado de discos para refrescar cambios sin reiniciar la app.',
+            'Hecho din?mico el estado de discos para refrescar cambios sin reiniciar la app.',
         ],
     ),
     (
@@ -409,8 +425,8 @@ CHANGELOG = [
         [
             'Añadido panel Estado de discos en Inicio con acceso a Disk Management.',
             'El panel se adapta en altura cuando hay más unidades para no cortar información.',
-            'Añadido refresco periódico del estado de discos.',
-            'Mejorado el botón Disk Management para seguir el patrón visual de las tarjetas.',
+            'Añadido refresco peri?dico del estado de discos.',
+            'Mejorado el botón Disk Management para seguir el patr?n visual de las tarjetas.',
         ],
     ),
     (
@@ -418,8 +434,8 @@ CHANGELOG = [
         '22/04/2026',
         [
             'Añadido widget Teclado ESP en Inicio.',
-            'El widget puede aplicar Español/España como teclado principal del sistema.',
-            'Sincronizar hora configura España, formato regional y reloj de 24 horas.',
+            'El widget puede aplicar Español/Espa?a como teclado principal del sistema.',
+            'Sincronizar hora configura Espa?a, formato regional y reloj de 24 horas.',
             'Eliminada la ruta de recursos visible al pie de Inicio para dejar una pantalla más limpia.',
         ],
     ),
@@ -437,7 +453,7 @@ CHANGELOG = [
         '2.1.16',
         '20/04/2026',
         [
-            'Añadida opción Prepare Schema dentro de Exchange.',
+            'Añadida opci?n Prepare Schema dentro de Exchange.',
             'Se solicitan dominio y Organization Name antes de preparar AD/schema.',
             'Se comprueba conectividad con ping antes de ejecutar comandos de Exchange.',
             'PrepareSchema, PrepareAD y PrepareAllDomains se ejecutan por consola con barra de progreso.',
@@ -478,9 +494,9 @@ CHANGELOG = [
         '29/03/2026',
         [
             'Mejoradas ventanas modernas de entrada para licencia, dominio, KMS y datos solicitados al usuario.',
-            'Unificadas ventanas de información para eliminar cajas antiguas de Windows cuando era posible.',
-            'Mejorado redimensionado de pantalla y aparición de scroll solo cuando el contenido no cabe.',
-            'Añadida recomendación de compilación segura con PyInstaller, UPX y licencia en hash.',
+            'Unificadas ventanas de información para eliminar cajas obsoletas de Windows cuando era posible.',
+            'Mejorado redimensionado de pantalla y aparici?n de scroll solo cuando el contenido no cabe.',
+            'Añadida recomendaci?n de compilaci?n segura con PyInstaller, UPX y licencia en hash.',
         ],
     ),
     (
@@ -517,7 +533,7 @@ CHANGELOG = [
         '1.9.0',
         '25/01/2026',
         [
-            'Cierre de la rama antigua antes del rediseño moderno.',
+            'Cierre de la rama previa antes del rediseño moderno.',
             'La app queda como instalador monolítico con SharePoint roles, SharePoint prerrequisitos, KMS y botones reservados.',
             'Se mantiene una sola ventana con logo, botones, barra de progreso, porcentaje y consola interna.',
         ],
@@ -528,8 +544,8 @@ CHANGELOG = [
         [
             'Pulida la ventana principal CustomTkinter con centrado, tamaño mínimo y layout por columnas.',
             'Añadido logo visible en la pantalla principal usando recursos empaquetables.',
-            'Añadido pie de página con autoría y marca Beta 0.2.',
-            'Preparado el aspecto final de la rama antigua antes del cambio grande de interfaz.',
+            'Añadido pie de página con autor?a y marca Beta 0.2.',
+            'Preparado el aspecto final de la rama previa antes del cambio grande de interfaz.',
         ],
     ),
     (
@@ -546,7 +562,7 @@ CHANGELOG = [
         '1.6.0',
         '02/01/2026',
         [
-            'Consolidado el flujo de ejecución por hilos para que las tareas largas no bloqueen completamente la UI.',
+            'Consolidado el flujo de ejecuci?n por hilos para que las tareas largas no bloqueen completamente la UI.',
             'Integrada redirección de salida a una consola interna.',
             'Mejorada la visibilidad de porcentaje y progreso durante tareas de roles, prerrequisitos y KMS.',
             'Añadido botón de reinicio del sistema al terminar operaciones que lo requieren.',
@@ -570,7 +586,7 @@ CHANGELOG = [
         '05/12/2025',
         [
             'Añadido instalador especial de AppFabric mediante PowerShell.',
-            'Añadida ejecución de instaladores MSI y EXE desde la carpeta SHAPRE.',
+            'Añadida ejecuci?n de instaladores MSI y EXE desde la carpeta SHAPRE.',
             'Añadida programación RunOnce para continuar prerrequisitos tras reinicio.',
             'Añadida limpieza de progreso cuando termina la secuencia de prerrequisitos.',
         ],
@@ -603,7 +619,7 @@ CHANGELOG = [
             'Añadida pantalla splash con escudo y mensaje de bienvenida.',
             'Añadida carga de logotipo.ico y EscudoRT.png desde ruta compatible con PyInstaller.',
             'Añadida consola interna para mostrar salida de comandos al usuario.',
-            'Añadida ejecución de tareas en segundo plano con threading.',
+            'Añadida ejecuci?n de tareas en segundo plano con threading.',
             'Añadida barra de progreso real para tareas largas.',
             'Añadido botón Cancelar y variable global de cancelación para detener bucles de instalación.',
             'Preparada la base para roles, prerrequisitos y KMS dentro de la misma ventana.',
@@ -620,3 +636,4 @@ CHANGELOG = [
         ],
     ),
 ]
+

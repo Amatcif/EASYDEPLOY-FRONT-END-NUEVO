@@ -40,7 +40,7 @@ class HeadlessEasyDeployHost(
     ProgramsTasksMixin,
     GuidesTasksMixin,
 ):
-    """Adaptador mínimo para reutilizar tareas antiguas sin arrancar Tkinter."""
+    """Adaptador mínimo para reutilizar tareas internas sin arrancar Tkinter."""
 
     def __init__(self, sink: EventSink):
         self.sink = sink
@@ -108,7 +108,7 @@ class HeadlessEasyDeployHost(
             return "error"
         if "[aviso]" in text or "warning" in text or "advertencia" in text:
             return "warning"
-        if "[ok]" in text or "correctamente" in text or "exito" in text or "éxito" in text:
+        if "[ok]" in text or "correctamente" in text or "exito" in text or "?xito" in text:
             return "success"
         return "info"
 
@@ -379,7 +379,7 @@ class HeadlessEasyDeployHost(
         self.cancelar_proceso()
 
     def show_frame(self, name):
-        self.sink.emit("status", level="info", message=f"Vista solicitada por tarea antigua: {name}")
+        self.sink.emit("status", level="info", message=f"Vista solicitada por tarea interna: {name}")
 
     def update_control_bar(self, state="finished"):
         self.sink.emit("status", level="info", message=f"Estado de tarea: {state}")
@@ -398,3 +398,4 @@ class HeadlessEasyDeployHost(
                 return False
             time.sleep(0.2)
         return True
+
